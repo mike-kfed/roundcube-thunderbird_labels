@@ -54,9 +54,10 @@ class thunderbird_labels extends rcube_plugin
 			$message->list_flags['extra_flags']['tb_labels'] = array(); # always set extra_flags, needed for javascript later!
 			foreach ($message->flags as $flag)
 			{
-				if (strpos($flag, '$Label') === 0)
+				$flag = strtolower($flag);
+				if (strpos($flag, '$label') === 0)
 				{
-					$flag_no = str_replace('$Label', '', $flag);
+					$flag_no = str_replace('$label', '', $flag);
 					$message->list_flags['extra_flags']['tb_labels'][] = (int)$flag_no;
 				}
 			}
