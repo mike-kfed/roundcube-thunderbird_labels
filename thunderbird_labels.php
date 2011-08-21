@@ -33,11 +33,42 @@ class thunderbird_labels extends rcube_plugin
 			);
 		
 		$this->register_action('plugin.thunderbird_labels.set_flags', array($this, 'set_flags'));
+		
+		if ($this->require_plugin('contextmenu'))
+		{
+			$rcmail = rcmail::get_instance();
+			if ($rcmail->action == '')
+				$this->add_hook('render_mailboxlist', array($this, 'show_tb_label_contextmenu'));
+		}
 	}
 	
-	function read_flags($args)
+	public function show_tb_label_contextmenu($args)
 	{
-		//write_log($this->name, print_r($args, true));
+		$rcmail = rcmail::get_instance();
+		$this->add_texts('localization/');
+		#$this->api->output->add_label('copymessage.copyingmessage');
+
+		$li = html::tag('li', array('class' => 'submenu'), Q($this->gettext('label')) . $this->_gen_label_submenu($args, 'tb_label_ctxm_submenu'));
+		$out .= html::tag('ul', array('id' => 'tb_label_ctxm_mainmenu'), $li);
+		$this->api->output->add_footer(html::div(array('style' => 'display: none;'), $out));
+	}
+	
+	private function _gen_label_submenu($args, $id)
+	{
+		$rcmail = rcmail::get_instance();
+		$out = '';
+		for ($i = 0; $i < 6; $i++)
+		{
+			$separator = ($i == 0)? ' separator_below' :'';
+			$out .= '<li class="label'.$i.$separator.' ctxm_tb_label"><a href="#ctxm_tb_label" class="active" onclick="rcmail_ctxm_label_set('.$i.')">'.$i.' '.$this->gettext('label'.$i).'</a></li>';
+		}
+		$out = html::tag('ul', array('class' => 'popupmenu toolbarmenu folders', 'id' => $id), $out);
+		return $out;
+	}
+	
+	public function read_flags($args)
+	{
+		#write_log($this->name, print_r($args, true));
 		// add color information for all messages
 		#$rcmail = rcmail::get_instance();
 		#$this->prefs = $rcmail->config->get('thunderbird_labels', array());
@@ -67,7 +98,7 @@ class thunderbird_labels extends rcube_plugin
 	
 	function set_flags()
 	{
-		write_log($this->name, print_r($_GET, true));
+		#write_log($this->name, print_r($_GET, true));
 
 		$rcmail = rcmail::get_instance();
 		$imap = $rcmail->imap;
