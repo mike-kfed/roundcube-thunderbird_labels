@@ -3,6 +3,7 @@ v0.3
 + Added Russian Translation by Николай Николай
 + Labeling multiple messages now works exactly like in Thunderbird
 + Shortcut keys 0-5 added for quick labeling like in Thunderbird
++ attach a Thunderbird Label submenu for contextmenu plugin if it is available
 
 v0.2
 ---
