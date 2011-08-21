@@ -4,6 +4,9 @@
 * http://code.google.com/p/rcmail-thunderbird-labels/
 */
 
+// global variable for contextmenu actions
+rcmail.tb_label_no = '';
+
 // -- add my submenu to roundcubes UI
 rcube_mail_ui.prototype.tb_label_menu = function() {
   add = {
@@ -15,7 +18,7 @@ rcube_mail_ui.prototype.tb_label_menu = function() {
     this.popups.tb_label_menu.obj = obj;
   else {
     delete this.popups.tb_label_menu;
-  }
+  } 
 }
 
 function rcmail_tb_label_menu(p)
@@ -104,7 +107,15 @@ function rcm_tb_label_create_popupmenu()
 			cur_a.removeClass('active');
 		else
 			cur_a.addClass('active');
-		
+	}
+}
+
+function rcm_tb_label_init_onclick()
+{
+	for (i = 0; i < 6; i++)
+	{
+		var cur_a = $('#tb_label_popup li.label' + i +' a');
+	
 		// TODO check if click event is defined instead of unbinding?
 		cur_a.unbind('click');
 		cur_a.click(function() {
@@ -130,6 +141,18 @@ function rcm_tb_label_create_popupmenu()
 					toggle_label = 'label' + i;
 					toggle_label_no = i;
 					// compile list of unflag and flag msgs and then send command
+					// Thunderbird modifies multiple message flags like it did the first in the selection
+					// e.g. first message has flag1, you click flag1, every message select loses flag1, the ones not having flag1 don't get it!
+					var first_toggle_mode = '';
+					var first_message = rcmail.env.messages[selection[0]];
+					if (first_message.flags
+						&& jQuery.inArray(toggle_label_no,
+								first_message.flags.tb_labels) >= 0
+						)
+						first_toggle_mode = 'off';
+					else
+						first_toggle_mode = 'on';
+					
 					var flag_uids = [];
 					var unflag_uids = [];
 					jQuery.each(selection, function (idx, uid) {
@@ -138,9 +161,15 @@ function rcm_tb_label_create_popupmenu()
 								&& jQuery.inArray(toggle_label_no,
 										message.flags.tb_labels) >= 0
 								)
-								unflag_uids.push(uid);
+							{
+								if (first_toggle_mode == 'off')
+									unflag_uids.push(uid);
+							}
 							else
-								flag_uids.push(uid);
+							{
+								if (first_toggle_mode == 'on')
+									flag_uids.push(uid);
+							}
 					});
 					
 					if (unset_all)
@@ -165,7 +194,53 @@ function rcm_tb_label_create_popupmenu()
 	}
 }
 
+function rcmail_ctxm_label(command, el, pos)
+{
+	// my code works only on selected rows, contextmenu also on unselected
+	// so if no selection is available, use the uid set by contextmenu plugin
+	var selection = rcmail.message_list ? rcmail.message_list.get_selection() : [];
+	
+	if (!selection.length && !rcmail.env.uid)
+		return;
+	if (!selection.length && rcmail.env.uid)
+		rcmail.message_list.select_row(rcmail.env.uid);
+	
+	var cur_a = $('#tb_label_popup li.label' + rcmail.tb_label_no +' a');
+	if (cur_a)
+	{
+		cur_a.click();
+	}
+	
+	return;
+}
+
+function rcmail_ctxm_label_set(which)
+{
+	// hack for my contextmenu submenu hack to propagate the selected label-no
+	rcmail.tb_label_no = which;
+}
+
+
 $(document).ready(function() {
+	rcm_tb_label_init_onclick();
+	// add keyboard shortcuts
+	$(document).keyup(function(e) {
+		//console.log('Handler for .keyup() called.' + e.which);
+		var label_no = e.which - 48;
+		var cur_a = $('#tb_label_popup li.label' + label_no +' a');
+		
+		if (cur_a)
+		{
+			cur_a.click();
+		}
+	});
+	
+	// if exists add contextmenu entries
+	if (window.rcm_contextmenu_register_command) {
+		rcm_contextmenu_register_command('ctxm_tb_label', rcmail_ctxm_label, $('#tb_label_ctxm_mainmenu'), 'moreacts', 'after', true);
+	}
+	
+	// add roundcube events
 	rcmail.addEventListener('insertrow', function(event) { rcm_tb_label_insert(event.uid, event.row); });
 	
 	rcmail.addEventListener('init', function(evt) {
