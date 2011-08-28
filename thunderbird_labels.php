@@ -4,7 +4,7 @@
  *
  * Plugin to show the 5 Message Labels Thunderbird Email-Client provides for IMAP
  *
- * @version 0.1
+ * @version $Revision$
  * @author Michael Kefeder
  * @url http://code.google.com/p/rcmail-thunderbird-labels/
  */
@@ -83,6 +83,7 @@ class thunderbird_labels extends rcube_plugin
 		{
 			#write_log($this->name, print_r($message->flags, true));
 			$message->list_flags['extra_flags']['tb_labels'] = array(); # always set extra_flags, needed for javascript later!
+			if (is_array($message->flags))
 			foreach ($message->flags as $flag)
 			{
 				$flag = strtolower($flag);
