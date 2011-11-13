@@ -6,7 +6,7 @@
 * CSS is Based on a patch for roundcube 0.3 I found a long time ago
 */
 
-#rcmTBLabelBtn {
+#tb_label_popuplink {
   background-image: url(thunderbird_32.png);
   background-repeat: no-repeat;
   width: 32px;

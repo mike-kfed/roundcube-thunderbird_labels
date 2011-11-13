@@ -7,24 +7,10 @@
 // global variable for contextmenu actions
 rcmail.tb_label_no = '';
 
-// -- add my submenu to roundcubes UI
-rcube_mail_ui.prototype.tb_label_menu = function() {
-  add = {
-    tb_label_menu:     {id:'tb_label_popup'}
-  };
-  this.popups = $.extend(this.popups, add);
-  var obj = $('#'+this.popups.tb_label_menu.id);
-  if (obj.length)
-    this.popups.tb_label_menu.obj = obj;
-  else {
-    delete this.popups.tb_label_menu;
-  } 
-}
-
 function rcmail_tb_label_menu(p)
 {
-	if (!rcmail_ui.popups.tb_label_menu)
-		rcmail_ui.tb_label_menu();
+	if (!rcmail_ui.popups.tb_label_popup)
+		rcmail_ui.tb_label_popup_add();
 	
 	// Show the popup menu with tags
 	rcmail_ui.show_popupmenu('tb_label_popup');
@@ -54,16 +40,11 @@ function rcm_tb_label_submenu(p)
 {
 	// setup onclick and active/non active classes
 	rcm_tb_label_create_popupmenu();
-	// -- position the popup first, else it shows in weird places??
-	var tb_label_popup = $('#tb_label_popup');
-	
-	tb_label_popup.css('left', $(p).offset().left);
-	tb_label_popup.css('top', $(p).offset().top + 32);
 	
 	// -- create sensible popup, using roundcubes internals
-	if (!rcmail_ui.popups.tb_label_menu)
-		rcmail_ui.tb_label_menu();
-	rcmail_ui.show_popupmenu('tb_label_menu');
+	if (!rcmail_ui.popups.tb_label_popup)
+		rcmail_ui.tb_label_popup_add();
+	rcmail_ui.show_popupmenu('tb_label_popup');
 	return false;
 }
 
@@ -245,7 +226,7 @@ $(document).ready(function() {
 	
 	rcmail.addEventListener('init', function(evt) {
 		// create custom button
-		var button = $('<A>').attr('href', '#').attr('id', 'rcmTBLabelBtn').attr('title', rcmail.gettext('label', 'thunderbird_labels')).html('');
+		var button = $('<A>').attr('href', '#').attr('id', 'tb_label_popuplink').attr('title', rcmail.gettext('label', 'thunderbird_labels')).html('');
 		
 		button.bind('click', function(e) {
 			rcmail.command('plugin.thunderbird_labels.rcm_tb_label_submenu', this);
@@ -254,8 +235,24 @@ $(document).ready(function() {
 		
 		// add and register
 		rcmail.add_element(button, 'toolbar');
-		rcmail.register_button('plugin.thunderbird_labels.rcm_tb_label_submenu', 'rcmTBLabelBtn', 'link');
+		rcmail.register_button('plugin.thunderbird_labels.rcm_tb_label_submenu', 'tb_label_popuplink', 'link');
 		rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, true);
 	});
+	
+	// -- add my submenu to roundcubes UI
+	rcube_mail_ui.prototype.tb_label_popup_add = function() {
+/*console.log("tb_label_popup_add");
+		if (this.popups.tb_label_popup)
+			return;
+*/		add = {
+			tb_label_popup:     {id:'tb_label_popup'}
+		};
+		this.popups = $.extend(this.popups, add);
+		var obj = $('#'+this.popups.tb_label_popup.id);
+		if (obj.length)
+			this.popups.tb_label_popup.obj = obj;
+		else
+			delete this.popups.tb_label_popup;
+	};
 });
 

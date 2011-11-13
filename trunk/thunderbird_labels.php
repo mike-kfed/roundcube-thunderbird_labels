@@ -18,7 +18,7 @@ class thunderbird_labels extends rcube_plugin
 		$this->include_script('tb_label.js');
 		$this->add_texts('localization/', true);
 		$this->add_hook('messages_list', array($this, 'read_flags'));
-		$this->add_hook('render_page', array($this, 'tb_label_menu'));
+		$this->add_hook('render_page', array($this, 'tb_label_popup'));
 		$this->include_stylesheet($this->local_skin_path() . '/tb_label.css');
 		
 		$this->name = get_class($this);
@@ -34,7 +34,8 @@ class thunderbird_labels extends rcube_plugin
 		
 		$this->register_action('plugin.thunderbird_labels.set_flags', array($this, 'set_flags'));
 		
-		if ($this->require_plugin('contextmenu'))
+		if (method_exists($this, 'require_plugin')
+			&& $this->require_plugin('contextmenu'))
 		{
 			$rcmail = rcmail::get_instance();
 			if ($rcmail->action == '')
@@ -84,12 +85,14 @@ class thunderbird_labels extends rcube_plugin
 			#write_log($this->name, print_r($message->flags, true));
 			$message->list_flags['extra_flags']['tb_labels'] = array(); # always set extra_flags, needed for javascript later!
 			if (is_array($message->flags))
-			foreach ($message->flags as $flag)
+			foreach ($message->flags as $flagname => $flagvalue)
 			{
+				$flag = is_numeric("$flagvalue")? $flagname:$flagvalue;// for compatibility with < 0.5.4
 				$flag = strtolower($flag);
-				if (strpos($flag, '$label') === 0)
+				if (preg_match('/^\$?label/', $flag))
 				{
-					$flag_no = str_replace('$label', '', $flag);
+					$flag_no = preg_replace('/^\$?label/', '', $flag);
+					#write_log($this->name, "Flag:".$flag." Flag_no:".$flag_no);
 					$message->list_flags['extra_flags']['tb_labels'][] = (int)$flag_no;
 				}
 			}
@@ -126,7 +129,7 @@ class thunderbird_labels extends rcube_plugin
 		$this->api->output->send();
 	}
 	
-	function tb_label_menu()
+	function tb_label_popup()
 	{
 		$rcmail = rcmail::get_instance();
 		$out = '<div id="tb_label_popup" class="popupmenu">
@@ -138,7 +141,7 @@ class thunderbird_labels extends rcube_plugin
 		}
 		$out .= '</ul>
 		</div>';
-		$rcmail->output->add_gui_object('tb_label_menu', 'tb_label_popup');
+		$rcmail->output->add_gui_object('tb_label_popup_obj', 'tb_label_popup');
     	$rcmail->output->add_footer($out);
 	}
 }
