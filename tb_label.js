@@ -240,6 +240,7 @@ $(document).ready(function() {
 	});
 	
 	// -- add my submenu to roundcubes UI
+	if (window.rcube_mail_ui)
 	rcube_mail_ui.prototype.tb_label_popup_add = function() {
 /*console.log("tb_label_popup_add");
 		if (this.popups.tb_label_popup)
