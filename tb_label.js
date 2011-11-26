@@ -1,8 +1,10 @@
 /**
-* Author:
-* Michael Kefeder
-* http://code.google.com/p/rcmail-thunderbird-labels/
-*/
+ * Version:
+ * $Revision$
+ * Author:
+ * Michael Kefeder
+ * http://code.google.com/p/rcmail-thunderbird-labels/
+ */
 
 // global variable for contextmenu actions
 rcmail.tb_label_no = '';
