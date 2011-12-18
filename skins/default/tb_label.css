@@ -55,6 +55,27 @@
 {
   color: #C9C;
 }
+/* Colors for single/preview message window headers display */
+table.label1
+{
+  background-color: #FCC;
+}
+table.label2
+{
+  background-color: #FC3;
+}
+table.label3
+{
+  background-color: #3C3;
+}
+table.label4
+{
+  background-color: #99F;
+}
+table.label5
+{
+  background-color: #C9C;
+}
 
 /* Support for Thunderbird label: definition of the 5 label color */
 /* Unselected (unfocused) messages */

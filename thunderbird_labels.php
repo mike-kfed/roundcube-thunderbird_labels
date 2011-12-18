@@ -18,6 +18,8 @@ class thunderbird_labels extends rcube_plugin
 		$this->include_script('tb_label.js');
 		$this->add_texts('localization/', true);
 		$this->add_hook('messages_list', array($this, 'read_flags'));
+		$this->add_hook('message_load', array($this, 'read_single_flags'));
+		$this->add_hook('template_object_messageheaders', array($this, 'color_headers'));
 		$this->add_hook('render_page', array($this, 'tb_label_popup'));
 		$this->include_stylesheet($this->local_skin_path() . '/tb_label.css');
 		
@@ -31,6 +33,7 @@ class thunderbird_labels extends rcube_plugin
 			'LABEL4' => '$Label4',
 			'LABEL5' => '$Label5',
 			);
+		$this->message_tb_labels = array();
 		
 		$this->register_action('plugin.thunderbird_labels.set_flags', array($this, 'set_flags'));
 		
@@ -65,6 +68,46 @@ class thunderbird_labels extends rcube_plugin
 		}
 		$out = html::tag('ul', array('class' => 'popupmenu toolbarmenu folders', 'id' => $id), $out);
 		return $out;
+	}
+	
+	public function read_single_flags($args)
+	{
+		#write_log($this->name, print_r(($args['object']), true));
+		if (!count($this->prefs) 
+			or !isset($args['object']) 
+			)
+				return;
+		
+		if (is_array($args['object']->headers->flags))
+		{
+			$this->message_tb_labels = array();
+			foreach ($args['object']->headers->flags as $flagname => $flagvalue)
+			{
+				$flag = is_numeric("$flagvalue")? $flagname:$flagvalue;// for compatibility with < 0.5.4
+				$flag = strtolower($flag);
+				if (preg_match('/^\$?label/', $flag))
+				{
+					$flag_no = preg_replace('/^\$?label/', '', $flag);
+					#write_log($this->name, "Single message Flag: ".$flag." Flag_no:".$flag_no);
+					$this->message_tb_labels[] = (int)$flag_no;
+				}
+			}
+		}
+		# -- no return value for this hook
+	}
+	
+	/**
+	*	Writes labelnumbers for single message display
+	*	Coloring of Message header table happens via Javascript
+	*/
+	public function color_headers($p)
+	{
+		#write_log($this->name, print_r($p, true));
+		# -- always write array, even when empty
+		$p['content'] .= '<script type="text/javascript">
+		var tb_labels_for_message = ['.join(',', $this->message_tb_labels).'];
+		</script>';
+		return $p;
 	}
 	
 	public function read_flags($args)
