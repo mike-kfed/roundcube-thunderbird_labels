@@ -50,32 +50,83 @@ function rcm_tb_label_submenu(p)
 	return false;
 }
 
-function rcm_tb_label_flag_msgs(flag_uids, toggle_label_no)
+function rcm_tb_label_flag_toggle(flag_uids, toggle_label_no, onoff)
 {
+	var headers_table = $('table.headers-table');
+	var preview_frame = $('#messagecontframe');
+	// preview frame exists, simulate environment of single message view
+	if (preview_frame.length)
+	{
+		tb_labels_for_message = preview_frame.get(0).contentWindow.tb_labels_for_message;
+		headers_table = preview_frame.contents().find('table.headers-table');
+	}
+	
+	if (!rcmail.message_list
+		&& !headers_table)
+		return;
+	// for single message view
+	if (headers_table.length && flag_uids.length)
+	{
+		if (onoff == true)
+		{
+			// add color
+			headers_table.addClass('label'+toggle_label_no);
+			// add to flag list
+			tb_labels_for_message.push(toggle_label_no);
+		}
+		else
+		{
+			// remove color
+			headers_table.removeClass('label'+toggle_label_no);
+			var pos = jQuery.inArray(toggle_label_no, tb_labels_for_message);
+			if (pos > -1)
+				tb_labels_for_message.splice(pos, 1);
+		}
+		// exit function when in detail mode. when preview is active keep going
+		if (!rcmail.env.messages)
+			return;
+	}
 	jQuery.each(flag_uids, function (idx, uid) {
 			var message = rcmail.env.messages[uid];
 			var row = rcmail.message_list.rows[uid];
-			// add colors
-			var rowobj = $(row.obj);
-			rowobj.addClass('label'+toggle_label_no);
-			// add to flag list
-			message.flags.tb_labels.push(toggle_label_no)
+			if (onoff == true)
+			{
+				// add colors
+				var rowobj = $(row.obj);
+				rowobj.addClass('label'+toggle_label_no);
+				// add to flag list
+				message.flags.tb_labels.push(toggle_label_no);
+			}
+			else
+			{
+				// remove colors
+				var rowobj = $(row.obj);
+				rowobj.removeClass('label'+toggle_label_no);
+				// remove from flag list
+				var pos = jQuery.inArray(toggle_label_no, message.flags.tb_labels);
+				if (pos > -1)
+					message.flags.tb_labels.splice(pos, 1);
+			}
 	});
+}
+
+function rcm_tb_label_flag_msgs(flag_uids, toggle_label_no)
+{
+	rcm_tb_label_flag_toggle(flag_uids, toggle_label_no, true);
 }
 
 function rcm_tb_label_unflag_msgs(unflag_uids, toggle_label_no)
 {
-	jQuery.each(unflag_uids, function (idx, uid) {
-			var message = rcmail.env.messages[uid];
-			var row = rcmail.message_list.rows[uid];
-			// remove colors
-			var rowobj = $(row.obj);
-			rowobj.removeClass('label'+toggle_label_no);
-			// remove from flag list
-			var pos = jQuery.inArray(toggle_label_no, message.flags.tb_labels);
-			if (pos > -1)
-				message.flags.tb_labels.splice(pos, 1);
-	});
+	rcm_tb_label_flag_toggle(unflag_uids, toggle_label_no, false);
+}
+
+// helper function to get selected/active messages
+function rcm_tb_label_get_selection()
+{
+	var selection = rcmail.message_list ? rcmail.message_list.get_selection() : [];
+	if (selection.length == 0 && rcmail.env.uid)
+		selection = [rcmail.env.uid, ];
+	return selection;
 }
 
 function rcm_tb_label_create_popupmenu()
@@ -85,7 +136,8 @@ function rcm_tb_label_create_popupmenu()
 		var cur_a = $('li.label' + i +' a');
 		
 		// add/remove active class
-		var selection = rcmail.message_list ? rcmail.message_list.get_selection() : [];
+		var selection = rcm_tb_label_get_selection();
+		
 		if (selection.length == 0)
 			cur_a.removeClass('active');
 		else
@@ -104,7 +156,7 @@ function rcm_tb_label_init_onclick()
 		cur_a.click(function() {
 				var toggle_label = $(this).parent().attr('class');
 				var toggle_label_no = parseInt(toggle_label.replace('label', ''));
-				var selection = rcmail.message_list ? rcmail.message_list.get_selection() : [];
+				var selection = rcm_tb_label_get_selection();
 				
 				if (!selection.length)
 					return;
@@ -126,19 +178,40 @@ function rcm_tb_label_init_onclick()
 					// compile list of unflag and flag msgs and then send command
 					// Thunderbird modifies multiple message flags like it did the first in the selection
 					// e.g. first message has flag1, you click flag1, every message select loses flag1, the ones not having flag1 don't get it!
-					var first_toggle_mode = '';
-					var first_message = rcmail.env.messages[selection[0]];
-					if (first_message.flags
-						&& jQuery.inArray(toggle_label_no,
-								first_message.flags.tb_labels) >= 0
-						)
-						first_toggle_mode = 'off';
-					else
-						first_toggle_mode = 'on';
-					
+					var first_toggle_mode = 'on';
+					if (rcmail.env.messages)
+					{
+						var first_message = rcmail.env.messages[selection[0]];
+						if (first_message.flags
+							&& jQuery.inArray(toggle_label_no,
+									first_message.flags.tb_labels) >= 0
+							)
+							first_toggle_mode = 'off';
+						else
+							first_toggle_mode = 'on';
+					}
+					else // single message display
+					{
+						// flag already set?
+						if (jQuery.inArray(toggle_label_no,
+									tb_labels_for_message) >= 0)
+							first_toggle_mode = 'off';
+					}
 					var flag_uids = [];
 					var unflag_uids = [];
 					jQuery.each(selection, function (idx, uid) {
+							// message list not available (example: in detailview)
+							if (!rcmail.env.messages)
+							{
+								if (first_toggle_mode == 'on')
+									flag_uids.push(uid);
+								else
+									unflag_uids.push(uid);
+								// make sure for unset all there is the single message id
+								if (unset_all && unflag_uids.length == 0)
+									unflag_uids.push(uid);
+								return;
+							}
 							var message = rcmail.env.messages[uid];
 							if (message.flags
 								&& jQuery.inArray(toggle_label_no,
@@ -221,6 +294,16 @@ $(document).ready(function() {
 	// if exists add contextmenu entries
 	if (window.rcm_contextmenu_register_command) {
 		rcm_contextmenu_register_command('ctxm_tb_label', rcmail_ctxm_label, $('#tb_label_ctxm_mainmenu'), 'moreacts', 'after', true);
+	}
+	
+	// single message displayed?
+	if (window.tb_labels_for_message)
+	{
+		jQuery.each(tb_labels_for_message, function(idx, val)
+			{
+				rcm_tb_label_flag_msgs([-1,], val);
+			}
+		);
 	}
 	
 	// add roundcube events

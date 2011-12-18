@@ -5,12 +5,14 @@ Features
 ---
 - Displays the message rows using the same colors as Thunderbird does
 - Label of a message can be changed/set exactly like in Thunderbird
+- works together with the contextmenu plugin (when it's active and configured)
+- Shortcut keys 0-5 set the label for the marked messages
+- currently available translations: English, French, German, Polish, Russian
 
 TODO
 ---
 - Configure to display and/or modify the labels with the plugin
-- work together with the contextmenu plugin (when it's active and configured)
-- Shortcut keys 0-5 set the label for the marked messages
+- implement configure options as stated below
 
 INSTALL
 ---
