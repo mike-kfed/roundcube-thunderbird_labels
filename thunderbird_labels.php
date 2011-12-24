@@ -35,6 +35,18 @@ class thunderbird_labels extends rcube_plugin
 			);
 		$this->message_tb_labels = array();
 		
+		$this->add_button(
+			array(
+				'command' => 'plugin.thunderbird_labels.rcm_tb_label_submenu',
+				'id' => 'tb_label_popuplink',
+				'title' => 'label', # gets translated
+				'domain' => $this->ID,
+				'type' => 'link',
+				'content' => ' '
+			),
+			'toolbar'
+		);
+		
 		$this->register_action('plugin.thunderbird_labels.set_flags', array($this, 'set_flags'));
 		
 		if (method_exists($this, 'require_plugin')
