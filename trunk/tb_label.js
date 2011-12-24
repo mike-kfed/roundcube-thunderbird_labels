@@ -310,8 +310,8 @@ $(document).ready(function() {
 	rcmail.addEventListener('insertrow', function(event) { rcm_tb_label_insert(event.uid, event.row); });
 	
 	rcmail.addEventListener('init', function(evt) {
-		// create custom button
-		var button = $('<A>').attr('href', '#').attr('id', 'tb_label_popuplink').attr('title', rcmail.gettext('label', 'thunderbird_labels')).html('');
+		// create custom button, JS method, broken layout in Firefox 9 using PHP method now
+		/*var button = $('<A>').attr('href', '#').attr('id', 'tb_label_popuplink').attr('title', rcmail.gettext('label', 'thunderbird_labels')).html('');
 		
 		button.bind('click', function(e) {
 			rcmail.command('plugin.thunderbird_labels.rcm_tb_label_submenu', this);
@@ -321,6 +321,7 @@ $(document).ready(function() {
 		// add and register
 		rcmail.add_element(button, 'toolbar');
 		rcmail.register_button('plugin.thunderbird_labels.rcm_tb_label_submenu', 'tb_label_popuplink', 'link');
+		*/
 		rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, true);
 	});
 	

@@ -4,6 +4,7 @@ v0.5
 + show message color in headers table backgroundcolor (preview mode and
   single-message view)
 + modify thunderbird label from single message view
++ fixed broken layout in Firefox when in single message view
 
 v0.4.1
 ---
