@@ -15,6 +15,11 @@ class thunderbird_labels extends rcube_plugin
 	
 	function init()
 	{
+		$rcmail = rcmail::get_instance();
+		# -- disable plugin when printing message
+		if ($rcmail->action == 'print')
+			return;
+		
 		$this->include_script('tb_label.js');
 		$this->add_texts('localization/', true);
 		$this->add_hook('messages_list', array($this, 'read_flags'));
@@ -52,7 +57,6 @@ class thunderbird_labels extends rcube_plugin
 		if (method_exists($this, 'require_plugin')
 			&& $this->require_plugin('contextmenu'))
 		{
-			$rcmail = rcmail::get_instance();
 			if ($rcmail->action == '')
 				$this->add_hook('render_mailboxlist', array($this, 'show_tb_label_contextmenu'));
 		}
