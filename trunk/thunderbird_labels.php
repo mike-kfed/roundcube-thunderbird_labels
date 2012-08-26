@@ -48,7 +48,7 @@ class thunderbird_labels extends rcube_plugin
 				'domain' => $this->ID,
 				'type' => 'link',
 				'content' => ' ', # maybe put translated version of "Labels" here?
-				'class' => 'button'
+				'class' => ($rcmail->config->get('skin') == 'larry') ? 'button' : 'tb_noclass',
 			),
 			'toolbar'
 		);
