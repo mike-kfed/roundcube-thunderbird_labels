@@ -47,14 +47,17 @@ class thunderbird_labels extends rcube_plugin
 				'title' => 'label', # gets translated
 				'domain' => $this->ID,
 				'type' => 'link',
-				'content' => ' '
+				'content' => ' ', # maybe put translated version of "Labels" here?
+				'class' => 'button'
 			),
 			'toolbar'
 		);
 		
 		$this->register_action('plugin.thunderbird_labels.set_flags', array($this, 'set_flags'));
 		
+		
 		if (method_exists($this, 'require_plugin')
+			&& in_array('contextmenu', $rcmail->config->get('plugins'))
 			&& $this->require_plugin('contextmenu'))
 		{
 			if ($rcmail->action == '')
