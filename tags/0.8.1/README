@@ -1,0 +1,39 @@
+Thunderbird Labels Plugin for Roundcube Webmail
+---
+
+Features
+---
+- Displays the message rows using the same colors as Thunderbird does
+- Label of a message can be changed/set exactly like in Thunderbird
+- works together with the contextmenu plugin (when it's active and configured)
+- Shortcut keys 0-5 set the label for the marked messages
+- currently available translations: English, French, German, Polish, Russian
+
+TODO
+---
+- Configure to display and/or modify the labels with the plugin
+- implement configure options as stated below
+
+INSTALL
+---
+- unpack to plugins directory
+- add 'thunderbird_labels' to $rcmail_config['plugins'] in main.inc.php
+
+CONFIGURE
+---
+- Optional features
+  - modify_labels = true
+  - with_contextmenu = true
+  - enable_shortcuts = true
+
+Author
+---
+Michael Kefeder
+http://code.google.com/p/rcmail-thunderbird-labels/
+
+History
+---
+This plugin is based on a patch I found for roundcube 0.3 a long time ago.
+Since roundcube is now able to handle the labels without modification of its source I decided to create a plugin.
+There exists a "Tags plugin for RoundCube" http://sourceforge.net/projects/tagspluginrc/ which does something similar, my plugin emulates thunderbirds behaviour better I think (coloring the message rows for example)
+
