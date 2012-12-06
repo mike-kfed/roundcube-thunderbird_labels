@@ -14,4 +14,4 @@ $labels['label2'] = 'Travail';
 $labels['label3'] = 'Personnel';
 $labels['label4'] = 'A faire';
 $labels['label5'] = 'Plus tard';
-?>
+
