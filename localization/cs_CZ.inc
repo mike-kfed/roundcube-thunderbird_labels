@@ -16,4 +16,3 @@ $labels['label5'] = 'Později';
 
 $messages = array();
 
-?>
