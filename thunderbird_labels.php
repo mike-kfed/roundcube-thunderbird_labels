@@ -146,7 +146,7 @@ class thunderbird_labels extends rcube_plugin
 
 		$li = html::tag('li',
 		  array('class' => 'submenu'),
-		  Q($this->gettext('tb_label_contextmenu_title')) . $this->_gen_label_submenu($args, 'tb_label_ctxm_submenu'));
+		  '<span>'.Q($this->gettext('tb_label_contextmenu_title')).'</span>' . $this->_gen_label_submenu($args, 'tb_label_ctxm_submenu'));
 		$out .= html::tag('ul', array('id' => 'tb_label_ctxm_mainmenu'), $li);
 		$this->api->output->add_footer(html::div(array('style' => 'display: none;'), $out));
 	}
@@ -157,7 +157,10 @@ class thunderbird_labels extends rcube_plugin
 		for ($i = 0; $i < 6; $i++)
 		{
 			$separator = ($i == 0)? ' separator_below' :'';
-			$out .= '<li class="label'.$i.$separator.' ctxm_tb_label"><a href="#ctxm_tb_label" class="active" onclick="rcmail_ctxm_label_set('.$i.')">'.$i.' '.$this->gettext('label'.$i).'</a></li>';
+			$out .= '<li class="label'.$i.$separator.
+			  ' ctxm_tb_label"><a href="#ctxm_tb_label" class="active" onclick="rcmail_ctxm_label_set('.$i.')"><span>'.
+			  $i.' '.$this->gettext('label'.$i).
+			  '</span></a></li>';
 		}
 		$out = html::tag('ul', array('class' => 'popupmenu toolbarmenu folders', 'id' => $id), $out);
 		return $out;
