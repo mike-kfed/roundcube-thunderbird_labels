@@ -21,10 +21,12 @@ INSTALL
 
 CONFIGURE
 ---
+- Enable/disable labels
+  - tb_label_enable = true (implemented, can be changed by user in prefs UI)
 - Optional features
-  - modify_labels = true
-  - with_contextmenu = true
-  - enable_shortcuts = true
+  - tb_label_modify_labels = true (not implemented)
+  - tb_label_enable_contextmenu = true (implemented)
+  - tb_label_enable_shortcuts = true (implemented, can be changed by user in prefs UI)
 
 Author
 ---

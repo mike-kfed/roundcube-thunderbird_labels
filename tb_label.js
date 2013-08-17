@@ -292,20 +292,22 @@ function rcmail_ctxm_label_set(which)
 $(document).ready(function() {
 	rcm_tb_label_init_onclick();
 	// add keyboard shortcuts for normal keyboard and keypad
-	$(document).keyup(function(e) {
-		//console.log('Handler for .keyup() called.' + e.which);
-		var k = e.which;
-		if ((k > 47 && k < 58) || (k > 95 && k < 106))
-		{
-			var label_no = k % 48;
-			var cur_a = $('#tb_label_popup li.label' + label_no + ' a');
-			
-			if (cur_a)
-			{
-				cur_a.click();
-			}
-		}
-	});
+	if (rcmail.env.tb_label_enable_shortcuts) {
+    $(document).keyup(function(e) {
+      //console.log('Handler for .keyup() called.' + e.which);
+      var k = e.which;
+      if ((k > 47 && k < 58) || (k > 95 && k < 106))
+      {
+        var label_no = k % 48;
+        var cur_a = $('#tb_label_popup li.label' + label_no + ' a');
+      
+        if (cur_a)
+        {
+          cur_a.click();
+        }
+      }
+    });
+  }
 	
 	// if exists add contextmenu entries
 	if (window.rcm_contextmenu_register_command) {
