@@ -18,7 +18,9 @@ class thunderbird_labels extends rcube_plugin
 	{
 	  $this->rc = rcmail::get_instance();
 	  $this->load_config();
-	  $this->add_texts('localization/', true);
+	  $this->add_texts('localization/', false);
+	  
+	  $this->setCustomLabels();
 
 		if ($this->rc->task == 'mail') {
       # -- disable plugin when printing message
@@ -30,7 +32,9 @@ class thunderbird_labels extends rcube_plugin
         return;
       }
       
+      // pass 'tb_label_enable_shortcuts' and 'tb_label_style' prefs to JS
       $this->rc->output->set_env('tb_label_enable_shortcuts', $this->rc->config->get('tb_label_enable_shortcuts'));
+      $this->rc->output->set_env('tb_label_style', $this->rc->config->get('tb_label_style'));
     
       $this->include_script('tb_label.js');
       $this->add_hook('messages_list', array($this, 'read_flags'));
@@ -57,12 +61,13 @@ class thunderbird_labels extends rcube_plugin
           'title' => 'tb_label_button_title',
           'domain' => $this->ID,
           'type' => 'link',
-          'content' => $this->gettext('tb_label_button_label'), 
+          'content' => ($this->rc->config->get('skin') == 'larry') ? $this->gettext('tb_label_button_label') : ' ', 
           'class' => ($this->rc->config->get('skin') == 'larry') ? 'button' : 'tb_noclass',
         ),
         'toolbar'
       );
     
+      // JS function "set_flags" => PHP function "set_flags"
       $this->register_action('plugin.thunderbird_labels.set_flags', array($this, 'set_flags'));
     
     
@@ -70,8 +75,9 @@ class thunderbird_labels extends rcube_plugin
         && in_array('contextmenu', $this->rc->config->get('plugins'))
         && $this->require_plugin('contextmenu')
         && $this->rc->config->get('tb_label_enable_contextmenu')) {
-        if ($this->rc->action == '')
+        if ($this->rc->action == '') {
           $this->add_hook('render_mailboxlist', array($this, 'show_tb_label_contextmenu'));
+        }
       }
     } elseif ($this->rc->task == 'settings') {
 
@@ -80,6 +86,24 @@ class thunderbird_labels extends rcube_plugin
     }
 	}
 
+  private function setCustomLabels() {
+    $c = $this->rc->config->get('tb_label_custom_labels');
+    if (empty($c)) {
+      // if no user specific labels, use localized strings by default
+      $this->rc->config->set('tb_label_custom_labels', array(
+        0 => $this->getText('label0'),
+        1 => $this->getText('label1'),
+        2 => $this->getText('label2'),
+        3 => $this->getText('label3'),
+        4 => $this->getText('label4'),
+        5 => $this->getText('label5')
+      ));
+    }
+    // pass label strings to JS
+    $this->rc->output->set_env('tb_label_custom_labels', $this->rc->config->get('tb_label_custom_labels'));
+  }
+
+  // display thunderbird-labels prefs in Roundcube Settings
   public function prefs_list($args) {
     if ($args['section'] != 'mailbox') {
       return $args;
@@ -118,9 +142,43 @@ class thunderbird_labels extends rcube_plugin
       );
     }
     
+    $key = 'tb_label_style';
+    if (!in_array($key, $dont_override)) {
+      $select = new html_select(array(
+      'name' => $key,
+      'id' => $key
+      ));
+      $select->add(array('thunderbird', 'bullets'), array('thunderbird', 'bullets'));
+      $content = $select->show($this->rc->config->get($key));
+    
+      $args['blocks']['tb_label']['options'][$key] = array(
+        'title' => $this->gettext('tb_label_style_option'),
+        'content' => $content
+      );    
+    }
+    
+    $key = 'tb_label_custom_labels';
+    if (!in_array($key, $dont_override) && $this->rc->config->get('tb_label_modify_labels')) {
+      $old = $this->rc->config->get($key);
+      for($i=1; $i<=5; $i++) {
+        $input = new html_inputfield(array(
+          'name' => $key.$i,
+          'id' => $key.$i,
+          'type' => 'text',
+          'autocomplete' => 'off',
+          'value' => $old[$i]));
+    
+        $args['blocks']['tb_label']['options'][$key.$i] = array(
+          'title' => $this->gettext('tb_label_label')." ".$i,
+          'content' => $input->show()
+        );
+      }
+    }
+    
     return $args;
   }
-  
+
+  // save prefs after modified in UI  
   public function prefs_save($args) {
     if ($args['section'] != 'mailbox') {
       return $args;
@@ -135,6 +193,20 @@ class thunderbird_labels extends rcube_plugin
     if (!in_array('tb_label_enable_shortcuts', $dont_override)) {  
       $args['prefs']['tb_label_enable_shortcuts'] = get_input_value('tb_label_enable_shortcuts', RCUBE_INPUT_POST) ? true : false;
     }
+    if (!in_array('tb_label_style', $dont_override)) {  
+      $args['prefs']['tb_label_style'] = get_input_value('tb_label_style', RCUBE_INPUT_POST);
+    }
+    if (!in_array('tb_label_custom_labels', $dont_override) && $this->rc->config->get('tb_label_modify_labels')) {
+      $args['prefs']['tb_label_custom_labels'] = array(
+        0 => $this->gettext('label0'),
+        1 => get_input_value('tb_label_custom_labels1', RCUBE_INPUT_POST),
+        2 => get_input_value('tb_label_custom_labels2', RCUBE_INPUT_POST),
+        3 => get_input_value('tb_label_custom_labels3', RCUBE_INPUT_POST),
+        4 => get_input_value('tb_label_custom_labels4', RCUBE_INPUT_POST),
+        5 => get_input_value('tb_label_custom_labels5', RCUBE_INPUT_POST)
+      );
+    }
+    
     
     return $args;
   
@@ -154,12 +226,13 @@ class thunderbird_labels extends rcube_plugin
 	private function _gen_label_submenu($args, $id)
 	{
 		$out = '';
+		$custom_labels = $this->rc->config->get('tb_label_custom_labels');
 		for ($i = 0; $i < 6; $i++)
 		{
 			$separator = ($i == 0)? ' separator_below' :'';
 			$out .= '<li class="label'.$i.$separator.
 			  ' ctxm_tb_label"><a href="#ctxm_tb_label" class="active" onclick="rcmail_ctxm_label_set('.$i.')"><span>'.
-			  $i.' '.$this->gettext('label'.$i).
+			  $i.' '.$custom_labels[$i].
 			  '</span></a></li>';
 		}
 		$out = html::tag('ul', array('class' => 'popupmenu toolbarmenu folders', 'id' => $id), $out);
@@ -235,6 +308,7 @@ class thunderbird_labels extends rcube_plugin
 		return($args);
 	}
 	
+	// set flags in IMAP server
 	function set_flags()
 	{
 		#write_log($this->name, print_r($_GET, true));
@@ -265,12 +339,13 @@ class thunderbird_labels extends rcube_plugin
 	
 	function tb_label_popup()
 	{
+	  $custom_labels = $this->rc->config->get('tb_label_custom_labels');
 		$out = '<div id="tb_label_popup" class="popupmenu">
 			<ul class="toolbarmenu">';
 		for ($i = 0; $i < 6; $i++)
 		{
 			$separator = ($i == 0)? ' separator_below' :'';
-			$out .= '<li class="label'.$i.$separator.'"><a href="#" class="active">'.$i.' '.$this->gettext('label'.$i).'</a></li>';
+			$out .= '<li class="label'.$i.$separator.'"><a href="#" class="active">'.$i.' '.$custom_labels[$i].'</a></li>';
 		}
 		$out .= '</ul>
 		</div>';
