@@ -11,8 +11,7 @@ Features
 
 TODO
 ---
-- Configure to display and/or modify the labels with the plugin
-- implement configure options as stated below
+- allow users to have an arbitrary number of labels
 
 INSTALL
 ---
@@ -21,12 +20,13 @@ INSTALL
 
 CONFIGURE
 ---
-- Enable/disable labels
-  - tb_label_enable = true (implemented, can be changed by user in prefs UI)
-- Optional features
-  - tb_label_modify_labels = true (not implemented)
-  - tb_label_enable_contextmenu = true (implemented)
-  - tb_label_enable_shortcuts = true (implemented, can be changed by user in prefs UI)
+See config.inc.php
+
+  - tb_label_enable = true/false (can be changed by user in prefs UI)
+  - tb_label_modify_labels/false = true
+  - tb_label_enable_contextmenu = true/false
+  - tb_label_enable_shortcuts = true/false (can be changed by user in prefs UI)
+  - tb_label_style = 'bullets' or 'thunderbird'
 
 Author
 ---

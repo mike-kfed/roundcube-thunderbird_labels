@@ -20,3 +20,5 @@ $labels['tb_label_enable_shortcuts_option'] = 'Activer les raccourcis clavier';
 $labels['tb_label_button_label'] = 'Tags';
 $labels['tb_label_button_title'] = 'Affecter des tags aux messages';
 $labels['tb_label_contextmenu_title'] = 'Tags';
+$labels['tb_label_style_option'] = 'Style graphique';
+$labels['tb_label_label'] = "Tag";
