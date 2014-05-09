@@ -206,7 +206,11 @@ div#labelbox span.tb_label_span5 {
   background-color: #FF33FF;
 }  
 
-
+/* icon for settings-section */
+#sections-table tbody #rcmrowthunderbird_labels td.section {
+	background-image: url(thunderbird_24.png);
+	background-position: 3px 3px;
+}
 
 /* Non-labeled selected message: changed to make it look "like" Thunderbird */
 /*#messagelist tr.selected td
