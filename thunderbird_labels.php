@@ -82,7 +82,9 @@ class thunderbird_labels extends rcube_plugin
 		}
 		elseif ($this->rc->task == 'settings')
 		{
+			$this->include_stylesheet($this->local_skin_path() . '/tb_label.css');
 			$this->add_hook('preferences_list', array($this, 'prefs_list'));
+			$this->add_hook('preferences_sections_list', array($this, 'prefs_section'));
 			$this->add_hook('preferences_save', array($this, 'prefs_save'));
 		}
 	}
@@ -106,10 +108,21 @@ class thunderbird_labels extends rcube_plugin
 		$this->rc->output->set_env('tb_label_custom_labels', $this->rc->config->get('tb_label_custom_labels'));
 	}
 
+	// create a section for the tb-labels Settings
+	public function prefs_section($args)
+    {
+        $args['list']['thunderbird_labels'] = array(
+    	        'id' => 'thunderbird_labels',
+	            'section' => Q($this->gettext('tb_label_options'))
+		);
+
+        return $args;
+    }
+
 	// display thunderbird-labels prefs in Roundcube Settings
 	public function prefs_list($args)
 	{
-		if ($args['section'] != 'mailbox')
+		if ($args['section'] != 'thunderbird_labels')
 			return $args;
 
 		$this->load_config();

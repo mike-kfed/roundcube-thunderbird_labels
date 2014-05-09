@@ -1,6 +1,9 @@
 v1.0
 ---
 + added Ukranian translation by Mykyta Solomko
+- completed German translation by thomas.cr82
++ Added Section for Roundcube Settings (Issue 14)
+- fixed issue 13: bullets below navigation in separate window
 
 v0.9.6
 ---
