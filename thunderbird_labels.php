@@ -204,7 +204,7 @@ class thunderbird_labels extends rcube_plugin
 	// save prefs after modified in UI  
 	public function prefs_save($args)
 	{
-		if ($args['section'] != 'mailbox')
+		if ($args['section'] != 'thunderbird_labels')
 		  return $args;
 
 		
