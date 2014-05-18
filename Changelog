@@ -4,6 +4,7 @@ v1.0
 - completed German translation by thomas.cr82
 + Added Section for Roundcube Settings (Issue 14)
 - fixed issue 13: bullets below navigation in separate window
+- fixed issue 15: listing of adressbook was impaired by tb_labels
 
 v0.9.6
 ---
