@@ -33,6 +33,8 @@ function rcmail_tb_label_menu(p)
 */
 function rcm_tb_label_insert(uid, row)
 {
+	if (typeof rcmail.env == 'undefined' || typeof rcmail.env.messages == 'undefined')
+		return;
 	var message = rcmail.env.messages[uid];
 	var rowobj = $(row.obj);
 	// add span container for little colored bullets
