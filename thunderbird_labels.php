@@ -61,9 +61,9 @@ class thunderbird_labels extends rcube_plugin
 					'title' => 'tb_label_button_title',
 					'domain' => $this->ID,
 					'type' => 'link',
-					'content' => ($this->rc->config->get('skin') == 'larry') ? $this->gettext('tb_label_button_label') : ' ', 
-					'class' => (($this->rc->config->get('skin') == 'larry') ? 'button' : 'tb_noclass').' buttonPas disabled',
-					'classact' => (($this->rc->config->get('skin') == 'larry') ? 'button' : 'tb_noclass'),
+					'content' => $this->gettext('tb_label_button_label'), 
+					'class' => 'button buttonPas disabled',
+					'classact' => 'button',
 					),
 				'toolbar'
 			);
