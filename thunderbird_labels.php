@@ -114,7 +114,7 @@ class thunderbird_labels extends rcube_plugin
     {
         $args['list']['thunderbird_labels'] = array(
     	        'id' => 'thunderbird_labels',
-	            'section' => Q($this->gettext('tb_label_options'))
+	            'section' => rcube::Q($this->gettext('tb_label_options'))
 		);
 
         return $args;
@@ -243,7 +243,7 @@ class thunderbird_labels extends rcube_plugin
 
 		$li = html::tag('li',
 		  array('class' => 'submenu'),
-		  '<span>'.Q($this->gettext('tb_label_contextmenu_title')).'</span>' . $this->_gen_label_submenu($args, 'tb_label_ctxm_submenu'));
+		  '<span>'.rcube::Q($this->gettext('tb_label_contextmenu_title')).'</span>' . $this->_gen_label_submenu($args, 'tb_label_ctxm_submenu'));
 		$out .= html::tag('ul', array('id' => 'tb_label_ctxm_mainmenu'), $li);
 		$this->api->output->add_footer(html::div(array('style' => 'display: none;'), $out));
 	}
