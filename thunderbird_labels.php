@@ -213,24 +213,24 @@ class thunderbird_labels extends rcube_plugin
 		$dont_override = (array) $this->rc->config->get('dont_override', array());
 		
 		if (!in_array('tb_label_enable', $dont_override))
-			$args['prefs']['tb_label_enable'] = get_input_value('tb_label_enable', RCUBE_INPUT_POST) ? true : false;
+			$args['prefs']['tb_label_enable'] = rcube_utils::get_input_value('tb_label_enable', rcube_utils::INPUT_POST) ? true : false;
 		
 		if (!in_array('tb_label_enable_shortcuts', $dont_override))
-		  $args['prefs']['tb_label_enable_shortcuts'] = get_input_value('tb_label_enable_shortcuts', RCUBE_INPUT_POST) ? true : false;
+		  $args['prefs']['tb_label_enable_shortcuts'] = rcube_utils::get_input_value('tb_label_enable_shortcuts', rcube_utils::INPUT_POST) ? true : false;
 
 		if (!in_array('tb_label_style', $dont_override))  
-			$args['prefs']['tb_label_style'] = get_input_value('tb_label_style', RCUBE_INPUT_POST);
+			$args['prefs']['tb_label_style'] = rcube_utils::get_input_value('tb_label_style', rcube_utils::INPUT_POST);
 	
 		if (!in_array('tb_label_custom_labels', $dont_override)
 			&& $this->rc->config->get('tb_label_modify_labels'))
 		{
 			$args['prefs']['tb_label_custom_labels'] = array(
 			0 => $this->gettext('label0'),
-			1 => get_input_value('tb_label_custom_labels1', RCUBE_INPUT_POST),
-			2 => get_input_value('tb_label_custom_labels2', RCUBE_INPUT_POST),
-			3 => get_input_value('tb_label_custom_labels3', RCUBE_INPUT_POST),
-			4 => get_input_value('tb_label_custom_labels4', RCUBE_INPUT_POST),
-			5 => get_input_value('tb_label_custom_labels5', RCUBE_INPUT_POST)
+			1 => rcube_utils::get_input_value('tb_label_custom_labels1', rcube_utils::INPUT_POST),
+			2 => rcube_utils::get_input_value('tb_label_custom_labels2', rcube_utils::INPUT_POST),
+			3 => rcube_utils::get_input_value('tb_label_custom_labels3', rcube_utils::INPUT_POST),
+			4 => rcube_utils::get_input_value('tb_label_custom_labels4', rcube_utils::INPUT_POST),
+			5 => rcube_utils::get_input_value('tb_label_custom_labels5', rcube_utils::INPUT_POST)
 			);
 		}
 	
@@ -266,7 +266,7 @@ class thunderbird_labels extends rcube_plugin
 	
 	public function read_single_flags($args)
 	{
-		#write_log($this->name, print_r(($args['object']), true));
+		#rcube::write_log($this->name, print_r(($args['object']), true));
 		if (!isset($args['object'])) {
 				return;
 		}
@@ -281,7 +281,7 @@ class thunderbird_labels extends rcube_plugin
 				if (preg_match('/^\$?label/', $flag))
 				{
 					$flag_no = preg_replace('/^\$?label/', '', $flag);
-					#write_log($this->name, "Single message Flag: ".$flag." Flag_no:".$flag_no);
+					#rcube::write_log($this->name, "Single message Flag: ".$flag." Flag_no:".$flag_no);
 					$this->message_tb_labels[] = (int)$flag_no;
 				}
 			}
@@ -295,7 +295,7 @@ class thunderbird_labels extends rcube_plugin
 	*/
 	public function color_headers($p)
 	{
-		#write_log($this->name, print_r($p, true));
+		#rcube::write_log($this->name, print_r($p, true));
 		# -- always write array, even when empty
 		$p['content'] .= '<script type="text/javascript">
 		var tb_labels_for_message = ['.join(',', $this->message_tb_labels).'];
@@ -305,7 +305,7 @@ class thunderbird_labels extends rcube_plugin
 	
 	public function read_flags($args)
 	{
-		#write_log($this->name, print_r($args, true));
+		#rcube::write_log($this->name, print_r($args, true));
 		// add color information for all messages
 		// dont loop over all messages if we dont have any highlights or no msgs
 		if (!isset($args['messages']) or !is_array($args['messages'])) {
@@ -315,7 +315,7 @@ class thunderbird_labels extends rcube_plugin
 		// loop over all messages and add $LabelX info to the extra_flags
 		foreach($args['messages'] as $message)
 		{
-			#write_log($this->name, print_r($message->flags, true));
+			#rcube::write_log($this->name, print_r($message->flags, true));
 			$message->list_flags['extra_flags']['tb_labels'] = array(); # always set extra_flags, needed for javascript later!
 			if (is_array($message->flags))
 			foreach ($message->flags as $flagname => $flagvalue)
@@ -325,7 +325,7 @@ class thunderbird_labels extends rcube_plugin
 				if (preg_match('/^\$?label/', $flag))
 				{
 					$flag_no = preg_replace('/^\$?label/', '', $flag);
-					#write_log($this->name, "Flag:".$flag." Flag_no:".$flag_no);
+					#rcube::write_log($this->name, "Flag:".$flag." Flag_no:".$flag_no);
 					$message->list_flags['extra_flags']['tb_labels'][] = (int)$flag_no;
 				}
 			}
@@ -336,21 +336,21 @@ class thunderbird_labels extends rcube_plugin
 	// set flags in IMAP server
 	function set_flags()
 	{
-		#write_log($this->name, print_r($_GET, true));
+		#rcube::write_log($this->name, print_r($_GET, true));
 
 		$imap = $this->rc->imap;
-		$cbox = get_input_value('_cur', RCUBE_INPUT_GET);
-		$mbox = get_input_value('_mbox', RCUBE_INPUT_GET);
-		$toggle_label = get_input_value('_toggle_label', RCUBE_INPUT_GET);
-		$flag_uids = get_input_value('_flag_uids', RCUBE_INPUT_GET);
+		$cbox = rcube_utils::get_input_value('_cur', rcube_utils::INPUT_GET);
+		$mbox = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GET);
+		$toggle_label = rcube_utils::get_input_value('_toggle_label', rcube_utils::INPUT_GET);
+		$flag_uids = rcube_utils::get_input_value('_flag_uids', rcube_utils::INPUT_GET);
 		$flag_uids = explode(',', $flag_uids);
-		$unflag_uids = get_input_value('_unflag_uids', RCUBE_INPUT_GET);
+		$unflag_uids = rcube_utils::get_input_value('_unflag_uids', rcube_utils::INPUT_GET);
 		$unflag_uids = explode(',', $unflag_uids);
 		
 		$imap->conn->flags = array_merge($imap->conn->flags, $this->add_tb_flags);
 		
-		#write_log($this->name, print_r($flag_uids, true));
-		#write_log($this->name, print_r($unflag_uids, true));
+		#rcube::write_log($this->name, print_r($flag_uids, true));
+		#rcube::write_log($this->name, print_r($unflag_uids, true));
 
 		if (!is_array($unflag_uids)
 			|| !is_array($flag_uids))
