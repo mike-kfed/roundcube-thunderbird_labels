@@ -2,6 +2,7 @@
     "name": "weird-birds/thunderbird_labels",
     "type": "roundcube-plugin",
     "keywords": ["mail","labels","tags"],
+    "license": "BSD-2-Clause",
     "authors": [
         {
             "name": "Michael Kefeder",
