@@ -23,36 +23,83 @@ rcm_tb_label_insert = (uid, row) ->
           rowobj.addClass 'label' + message.flags.tb_labels[idx]
   return
 
-rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
-  headers_table = $('table.headers-table')
+# fetches a variable from _one_ global source, the window holding the #mainscreen
+rcm_tb_label_find_main_window = ->
+  ms = $('#mainscreen')
   preview_frame = $('#messagecontframe')
-  tb_labels_for_message = []
-  # preview frame exists, simulate environment of single message view
-  if preview_frame.length
-    tb_labels_for_message = preview_frame.get(0).contentWindow.tb_labels_for_message
-    headers_table = preview_frame.contents().find('table.headers-table')
-  if !rcmail.message_list and !headers_table
+  popup_window = $('body.extwin')
+  # i have a mainscreen and preview_frame
+  # this means i run in the main window
+  if ms.length and preview_frame.length
+    w = window
+  # if have no mainscreen and body has class iframe
+  # this means i run in the iframe, better get my parent
+  if not ms.length and not preview_frame.length
+    # TODO check for body.iframe
+    w = window.parent
+  if popup_window.length
+    # actually it should be window.opener
+    # but a php hack injects the global variable into the popup
+    # TODO make it load from the super global?
+    #w = window.opener
+    w = window
+  ms = w.document.getElementById('mainscreen')
+  if not ms
+    console.log("mainscreen still not found")
+    return null
+  return w
+
+rcm_tb_label_global = (var_name) ->
+  return rcm_tb_label_find_main_window()[var_name]
+
+rcm_tb_label_global_set = (var_name, value) ->
+  rcm_tb_label_find_main_window()[var_name] = value
+
+
+rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
+  if not flag_uids.length
     return
-  # for single message view
-  if headers_table.length and flag_uids.length
+
+  preview_frame = $('#messagecontframe')
+  labels_for_message = rcm_tb_label_global('tb_labels_for_message')
+
+  # preview frame exists, try to find elements in preview iframe
+  if preview_frame.length
+    headers_table = preview_frame.contents().find('table.headers-table')
+    label_box = preview_frame.contents().find('#labelbox')
+  else
+    headers_table = $('table.headers-table')
+    label_box = $('#labelbox')
+  if !rcmail.message_list and !headers_table.length
+    console.log "no message_list no headers_table"
+    return
+  # for message preview, or single message view
+  if headers_table.length
     if onoff == true
       if rcmail.env.tb_label_style == 'bullets'
-        $('#labelbox').append '<span class="tb_label_span' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>'
+        label_box.append '<span class="tb_label_span' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>'
       else
         headers_table.addClass 'label' + toggle_label_no
       # add to flag list
-      tb_labels_for_message.push toggle_label_no
+      labels_for_message.push toggle_label_no
     else
       if rcmail.env.tb_label_style == 'bullets'
-        $('span.tb_label_span' + toggle_label_no).remove()
+        label_box.find('span.tb_label_span' + toggle_label_no).remove()
       else
         headers_table.removeClass 'label' + toggle_label_no
-      pos = jQuery.inArray(toggle_label_no, tb_labels_for_message)
+      pos = jQuery.inArray(toggle_label_no, labels_for_message)
       if pos > -1
-        tb_labels_for_message.splice pos, 1
-    # exit function when in detail mode. when preview is active keep going
-    if !rcmail.env.messages
-      return
+        labels_for_message.splice pos, 1
+    # make list unique
+    labels_for_message = jQuery.grep(labels_for_message, (v, k) ->
+      return jQuery.inArray(v, labels_for_message) is k
+    )
+    console.log('flags after', labels_for_message)
+    rcm_tb_label_global_set('tb_labels_for_message', labels_for_message)
+    # write global variable
+  # exit function when in detail mode. when preview is active keep going
+  if !rcmail.env.messages
+    return
   jQuery.each flag_uids, (idx, uid) ->
     message = rcmail.env.messages[uid]
     row = rcmail.message_list.rows[uid]
@@ -123,7 +170,8 @@ rcm_tb_label_init_onclick = ->
         toggle_label_no = i
         # compile list of unflag and flag msgs and then send command
         # Thunderbird modifies multiple message flags like it did the first in the selection
-        # e.g. first message has flag1, you click flag1, every message select loses flag1, the ones not having flag1 don't get it!
+        # e.g. first message has flag1, you click flag1, every message select loses flag1,
+        #      the ones not having flag1 don't get it!
         first_toggle_mode = 'on'
         if rcmail.env.messages
           first_message = rcmail.env.messages[selection[0]]
@@ -133,7 +181,7 @@ rcm_tb_label_init_onclick = ->
             first_toggle_mode = 'on'
         else
           # flag already set?
-          if jQuery.inArray(toggle_label_no, tb_labels_for_message) >= 0
+          if jQuery.inArray(toggle_label_no, rcm_tb_label_global('tb_labels_for_message')) >= 0
             first_toggle_mode = 'off'
         flag_uids = []
         unflag_uids = []

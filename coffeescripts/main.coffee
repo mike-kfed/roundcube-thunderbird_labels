@@ -9,6 +9,9 @@ require ('../node_modules/jquery')($, window)
 # document.ready
 $ ->
   rcm_tb_label_init_onclick()
+  # superglobal variable set? if not set it
+  if not rcm_tb_label_global('tb_labels_for_message')?
+    rcm_tb_label_global_set('tb_labels_for_message', [])
   # add keyboard shortcuts for keyboard and keypad if pref tb_label_enable_shortcuts=true
   if rcmail.env.tb_label_enable_shortcuts
     $(document).keyup (e) ->
@@ -24,18 +27,20 @@ $ ->
   if window.rcm_contextmenu_register_command
     rcm_contextmenu_register_command 'ctxm_tb_label', rcmail_ctxm_label, $('#tb_label_ctxm_mainmenu'), 'moreacts', 'after', true
   # single message displayed?
-  if window.tb_labels_for_message
+  labels_for_message = rcm_tb_label_global('tb_labels_for_message')
+  if labels_for_message
     labelbox_parent = $('div.message-headers')
     # larry skin
     if !labelbox_parent.length
       labelbox_parent = $('table.headers-table tbody tr:first-child')
       # classic skin
     labelbox_parent.append '<div id="labelbox"></div>'
-    tb_labels_for_message.sort (a, b) ->
+    labels_for_message.sort (a, b) ->
       a - b
-    jQuery.each tb_labels_for_message, (idx, val) ->
+    jQuery.each labels_for_message, (idx, val) ->
       rcm_tb_label_flag_msgs [ -1 ], val
       return
+    rcm_tb_label_global_set('tb_labels_for_message', labels_for_message)
   # add roundcube events
   rcmail.addEventListener 'insertrow', (event) ->
     rcm_tb_label_insert event.uid, event.row
