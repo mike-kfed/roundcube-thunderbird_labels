@@ -41,12 +41,15 @@ $ ->
       rcm_tb_label_flag_msgs [ -1 ], val
       return
     rcm_tb_label_global_set('tb_labels_for_message', labels_for_message)
-  # add roundcube events
+
+  # This hook is triggered after a new row was added to the message list
+  # or the contacts list respectively.
   rcmail.addEventListener 'insertrow', (event) ->
     rcm_tb_label_insert event.uid, event.row
     return
-  rcmail.addEventListener 'init', (evt) ->
 
+  # This is the place where plugins can add their UI elements and register custom commands.
+  rcmail.addEventListener 'init', (evt) ->
     #rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, true);
     rcmail.register_command 'plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, rcmail.env.uid
     # add event-listener to message list
@@ -55,9 +58,28 @@ $ ->
         rcmail.enable_command 'plugin.thunderbird_labels.rcm_tb_label_submenu', list.get_selection().length > 0
         return
     return
+
+  # handle response after refresh (try to update flags set by another
+  # email-client while being logged into roundcube)
+  rcmail.addEventListener 'responsebeforerefresh', (p) ->
+    # recent_flags env is set in php thunderbird_labels::check_recent_flags()
+    if p.response.env.recent_flags?
+      $.each p.response.env.recent_flags, (uid, flags) ->
+        unset_labels = [1..5]
+        $.each flags, (flagname, flagvalue) ->
+          if flagvalue and flagname.indexOf('label') is 0
+            label_no = parseInt flagname.replace('label', '')
+            rcm_tb_label_flag_msgs [ uid ], label_no
+            pos = jQuery.inArray(label_no, unset_labels)
+            if pos > -1
+              unset_labels.splice pos, 1
+        $.each unset_labels, (idx, label_no) ->
+          console.log("unset", uid, label_no)
+          rcm_tb_label_unflag_msgs [ uid ], label_no
+    return
+
   # -- add my submenu to roundcubes UI (for roundcube classic only?)
   if window.rcube_mail_ui
-
     rcube_mail_ui::tb_label_popup_add = ->
       add = tb_label_popup: id: 'tb_label_popup'
       @popups = $.extend(@popups, add)
@@ -69,7 +91,6 @@ $ ->
       return
 
   if window.rcube_mail_ui
-
     rcube_mail_ui::check_tb_popup = ->
       # larry skin doesn't have that variable, popup works automagically, return true
       if typeof @popups == 'undefined'

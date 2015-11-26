@@ -23,7 +23,9 @@ rcm_tb_label_insert = (uid, row) ->
           rowobj.addClass 'label' + message.flags.tb_labels[idx]
   return
 
-# fetches a variable from _one_ global source, the window holding the #mainscreen
+# Problem: mail-preview-pane is an iframe, so referencing global variables does
+# not work as intended. So here I try to find out where this javascript is run
+# and when needed adjust the pointer to the main window object.
 rcm_tb_label_find_main_window = ->
   ms = $('#mainscreen')
   preview_frame = $('#messagecontframe')
@@ -33,15 +35,18 @@ rcm_tb_label_find_main_window = ->
   if ms.length and preview_frame.length
     w = window
   # if have no mainscreen and body has class iframe
-  # this means i run in the iframe, better get my parent
+  # this means i run in the iframe of the preview, better get my parent
   if not ms.length and not preview_frame.length
-    # TODO check for body.iframe
+    # TODO check for $('body.iframe') might make it more reliable
     w = window.parent
   if popup_window.length
-    # actually it should be window.opener
-    # but a php hack injects the global variable into the popup
-    # TODO make it load from the super global?
-    #w = window.opener
+    # i run in a popup window (message to be shown in popup can be configured
+    # by the user)
+    # theoretically we should point at window.opener, but this is unreliable,
+    # reload of the page in popup window makes the relation between parent+popup
+    # potentially go away.
+    # php injects the needed global variables into the popup window html code
+    # Problem: changes of labels are not known to the main window.
     w = window
   ms = w.document.getElementById('mainscreen')
   if not ms
