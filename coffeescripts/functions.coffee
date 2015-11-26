@@ -76,7 +76,6 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
     headers_table = $('table.headers-table')
     label_box = $('#labelbox')
   if !rcmail.message_list and !headers_table.length
-    console.log "no message_list no headers_table"
     return
   # for message preview, or single message view
   if headers_table.length
@@ -109,6 +108,9 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
     message = rcmail.env.messages[uid]
     row = rcmail.message_list.rows[uid]
     if onoff == true
+      # check if label is already set
+      if jQuery.inArray(toggle_label_no, message.flags.tb_labels) > -1
+        return
       # add colors
       rowobj = $(row.obj)
       spanobj = rowobj.find('td.subject span.tb_label_dots')

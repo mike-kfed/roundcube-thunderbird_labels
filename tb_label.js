@@ -72,7 +72,6 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
     label_box = $('#labelbox');
   }
   if (!rcmail.message_list && !headers_table.length) {
-    console.log("no message_list no headers_table");
     return;
   }
   if (headers_table.length) {
@@ -108,6 +107,9 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
     message = rcmail.env.messages[uid];
     row = rcmail.message_list.rows[uid];
     if (onoff === true) {
+      if (jQuery.inArray(toggle_label_no, message.flags.tb_labels) > -1) {
+        return;
+      }
       rowobj = $(row.obj);
       spanobj = rowobj.find('td.subject span.tb_label_dots');
       if (rcmail.env.tb_label_style === 'bullets') {
