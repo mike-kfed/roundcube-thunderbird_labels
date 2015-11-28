@@ -4,15 +4,16 @@
  *
  * Plugin to show the 5 Message Labels Thunderbird Email-Client provides for IMAP
  *
- * @version $Revision$
+ * @version 1.2.0
  * @author Michael Kefeder
- * @url http://code.google.com/p/rcmail-thunderbird-labels/
+ * @url https://github.com/mike-kfed/rcmail-thunderbird-labels
  */
 class thunderbird_labels extends rcube_plugin
 {
 	public $task = 'mail|settings';
 	private $rc;
 	private $map;
+	private $_custom_flags_allowed = null;
 
 	function init()
 	{
@@ -43,15 +44,16 @@ class thunderbird_labels extends rcube_plugin
 			$this->add_hook('render_page', array($this, 'tb_label_popup'));
 			$this->add_hook('check_recent', array($this, 'check_recent_flags'));
 			$this->include_stylesheet($this->local_skin_path() . '/tb_label.css');
+			#$this->include_stylesheet($this->local_skin_path() . '/tb_label.php');
 
 			$this->name = get_class($this);
 			# -- additional TB flags
 			$this->add_tb_flags = array(
-			'LABEL1' => '$Label1',
-			'LABEL2' => '$Label2',
-			'LABEL3' => '$Label3',
-			'LABEL4' => '$Label4',
-			'LABEL5' => '$Label5',
+				/*'LABEL1' => '$Label1',
+				'LABEL2' => '$Label2',
+				'LABEL3' => '$Label3',
+				'LABEL4' => '$Label4',
+				'LABEL5' => '$Label5',*/
 			);
 			$this->message_tb_labels = array();
 
@@ -94,16 +96,16 @@ class thunderbird_labels extends rcube_plugin
 	private function setCustomLabels()
 	{
 		$c = $this->rc->config->get('tb_label_custom_labels');
-		if (empty($c))
+		if (empty($c) || isset($c[3]))
 		{
 			// if no user specific labels, use localized strings by default
 			$this->rc->config->set('tb_label_custom_labels', array(
-				0 => $this->getText('label0'),
-				1 => $this->getText('label1'),
-				2 => $this->getText('label2'),
-				3 => $this->getText('label3'),
-				4 => $this->getText('label4'),
-				5 => $this->getText('label5')
+				'LABEL0' => $this->getText('label0'),
+				'LABEL1' => $this->getText('label1'),
+				'LABEL2' => $this->getText('label2'),
+				'LABEL3' => $this->getText('label3'),
+				'LABEL4' => $this->getText('label4'),
+				'LABEL5' => $this->getText('label5')
 			));
 		}
 		// pass label strings to JS
@@ -112,14 +114,14 @@ class thunderbird_labels extends rcube_plugin
 
 	// create a section for the tb-labels Settings
 	public function prefs_section($args)
-    {
-        $args['list']['thunderbird_labels'] = array(
-    	        'id' => 'thunderbird_labels',
-	            'section' => rcube::Q($this->gettext('tb_label_options'))
+	{
+		$args['list']['thunderbird_labels'] = array(
+			'id' => 'thunderbird_labels',
+			'section' => rcube::Q($this->gettext('tb_label_options'))
 		);
 
-        return $args;
-    }
+		return $args;
+	}
 
 	// display thunderbird-labels prefs in Roundcube Settings
 	public function prefs_list($args)
@@ -274,18 +276,7 @@ class thunderbird_labels extends rcube_plugin
 
 		if (is_array($args['object']->headers->flags))
 		{
-			$this->message_tb_labels = array();
-			foreach ($args['object']->headers->flags as $flagname => $flagvalue)
-			{
-				$flag = is_numeric("$flagvalue")? $flagname:$flagvalue;// for compatibility with < 0.5.4
-				$flag = strtolower($flag);
-				if (preg_match('/^\$?label/', $flag))
-				{
-					$flag_no = preg_replace('/^\$?label/', '', $flag);
-					#rcube::write_log($this->name, "Single message Flag: ".$flag." Flag_no:".$flag_no);
-					$this->message_tb_labels[] = (int)$flag_no;
-				}
-			}
+			$this->message_tb_labels = $this->custom_flags(array_keys($args['object']->headers->flags));
 		}
 		# -- no return value for this hook
 	}
@@ -299,7 +290,7 @@ class thunderbird_labels extends rcube_plugin
 		#rcube::write_log($this->name, print_r($p, true));
 		# -- always write array, even when empty
 		$p['content'] .= '<script type="text/javascript">
-		var tb_labels_for_message = ['.join(',', $this->message_tb_labels).'];
+		var tb_labels_for_message = '.json_encode($this->message_tb_labels).';
 		</script>';
 		return $p;
 	}
@@ -319,17 +310,7 @@ class thunderbird_labels extends rcube_plugin
 			#rcube::write_log($this->name, print_r($message->flags, true));
 			$message->list_flags['extra_flags']['tb_labels'] = array(); # always set extra_flags, needed for javascript later!
 			if (is_array($message->flags))
-			foreach ($message->flags as $flagname => $flagvalue)
-			{
-				$flag = is_numeric("$flagvalue")? $flagname:$flagvalue;// for compatibility with < 0.5.4
-				$flag = strtolower($flag);
-				if (preg_match('/^\$?label/', $flag))
-				{
-					$flag_no = preg_replace('/^\$?label/', '', $flag);
-					#rcube::write_log($this->name, "Flag:".$flag." Flag_no:".$flag_no);
-					$message->list_flags['extra_flags']['tb_labels'][] = (int)$flag_no;
-				}
-			}
+				$message->list_flags['extra_flags']['tb_labels'] = $this->custom_flags(array_keys($message->flags));
 		}
 		return($args);
 	}
@@ -365,18 +346,20 @@ class thunderbird_labels extends rcube_plugin
 
 	function tb_label_popup()
 	{
-	  $custom_labels = $this->rc->config->get('tb_label_custom_labels');
+		$custom_labels = $this->rc->config->get('tb_label_custom_labels');
 		$out = '<div id="tb_label_popup" class="popupmenu">
 			<ul class="toolbarmenu">';
-		for ($i = 0; $i < 6; $i++)
+		$i = 0;
+		foreach ($custom_labels as $label_name => $human_readable)
 		{
 			$separator = ($i == 0)? ' separator_below' :'';
-			$out .= '<li class="label'.$i.$separator.'"><a href="#" class="active">'.$i.' '.$custom_labels[$i].'</a></li>';
+			$out .= '<li class="label'.$i.$separator.'" data-labelname="LABEL'.$i.'"><a href="#" class="active">'.$i.' '.$human_readable.'</a></li>';
+			$i++;
 		}
 		$out .= '</ul>
 		</div>';
 		$this->rc->output->add_gui_object('tb_label_popup_obj', 'tb_label_popup');
-    	$this->rc->output->add_footer($out);
+		$this->rc->output->add_footer($out);
 	}
 
 	/* Bastardised hook, actually supposed to modify the list of folders for refresh
@@ -384,24 +367,20 @@ class thunderbird_labels extends rcube_plugin
 	*/
 	function check_recent_flags($params)
 	{
-		#if ($params['all']) // this means config check_all_folders is set
-		#	return $params; // we do not check all folders!
-		#if (count($params['folders']) != 1)
-		#	return $params; // flag refresh makes only sense for one folder (the current)
 		$mbox_name = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GPC); // appears to be the current one
 		$uids = rcube_utils::get_input_value('_uids', rcube_utils::INPUT_GPC);
 		if ($uids && $mbox_name)
 		{
 			$mbox_name = $params['folders'][0];
 			$RCMAIL = $this->rc;
-			// -- from here it's from check_recent.inc
+			# -- from here it's from check_recent.inc
 			$data = $RCMAIL->storage->folder_data($mbox_name);
+
 			if (empty($_SESSION['list_mod_seq']) || $_SESSION['list_mod_seq'] != $data['HIGHESTMODSEQ']) {
 			   $flags = $RCMAIL->storage->list_flags($mbox_name, explode(',', $uids), $_SESSION['list_mod_seq']);
 			   foreach ($flags as $idx => $row) {
 			       $flags[$idx] = array_change_key_case(array_map('intval', $row));
 			   }
-
 			   // remember last HIGHESTMODSEQ value (if supported)
 			   if (!empty($data['HIGHESTMODSEQ'])) {
 			       $_SESSION['list_mod_seq'] = $data['HIGHESTMODSEQ'];
@@ -409,8 +388,75 @@ class thunderbird_labels extends rcube_plugin
 
 			   $RCMAIL->output->set_env('recent_flags', $flags);
 			}
-			// -- end of code copy from check_recent.inc
+			# -- end of code copy from check_recent.inc
+			if (isset($data['PERMANENTFLAGS']))
+			{
+				//rcube::write_log($this->name, "data:".print_r($data['PERMANENTFLAGS'], true));
+				$RCMAIL->output->set_env('custom_flags', $this->custom_flags($data['PERMANENTFLAGS']));
+			}
 		}
 		return $params;
+	}
+
+	/**
+	* Checks if the IMAP Server has support for custom flags
+	* According to RFC the server must respond with a '\*' within PERMANENTFLAGS
+	*/
+	function custom_flags_allowed($permanent_flags)
+	{
+		if (!is_null($this->_custom_flags_allowed)) // primitive caching
+			return $this->_custom_flags_allowed;
+		$this->_custom_flags_allowed = false;
+		foreach ($permanent_flags as $pf)
+		{
+			if ($pf == '\*')
+				$this->_custom_flags_allowed = true;
+		}
+		return $this->_custom_flags_allowed;
+	}
+
+	/**
+	* creates a list of custom flags besides the RFC default ones
+	*/
+	function custom_flags($permanent_flags)
+	{
+		$default_flags = [
+			'\Seen', '\Answered', // RFC3501
+			'\Flagged', '\Deleted', // RFC3501
+			'\Draft', '\Recent', // RFC3501
+			'SEEN', 'ANSWERED', // RFC3501 roundcubed
+			'FLAGGED', 'DELETED', // RFC3501 roundcubed
+			'DRAFT', 'RECENT', // RFC3501 roundcubed
+			'$MDNSent', // Message Disposition Notification, not of interest
+			'MDNSENT', // Message Disposition Notification, not of interest roundcubed
+			'Junk', // not a useful flag for the user?
+			'JUNK', // not a useful flag for the user? roundcubed
+			'NonJunk',  // not a useful flag for the user?
+			'NONJUNK',  // not a useful flag for the user? roundcubed
+			'\\*',  // means labels allowed
+			'*',  // means labels allowed roundcubed
+		];
+		// TODO: merge flags that should be hidden from tblabels config
+
+		/* TODO: flagnames contain $ sign, or umlauts (imap-utf-7 encoded meanging & will be in the name)
+		* smart way to recode those characters and create valid variable names?
+		* Valid CSS classname is easy, just escape everything outside of [a-zA-Z0-9_] using backslash
+		*/
+		$custom_flags = array();
+		foreach ($permanent_flags as $pf)
+		{
+			$pf = $this->roundcube_flag($pf);
+			if (!in_array($pf, $default_flags))
+				$custom_flags[] = $pf;
+		}
+		return $custom_flags;
+	}
+
+	/**
+	* Roundcube mangles the flagnames for some reason to uppercase and removes backslash and $
+	*/
+	function roundcube_flag($flag)
+	{
+		return ltrim(strtoupper($flag), '$\\');
 	}
 }

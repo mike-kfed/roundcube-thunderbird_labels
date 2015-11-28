@@ -1,7 +1,7 @@
 ###
 Version: 1.2.0
 Author: Michael Kefeder
-https:#github.com/mike-kfed/rcmail-thunderbird-labels
+https://github.com/mike-kfed/rcmail-thunderbird-labels
 ###
 
 require ('../node_modules/jquery')($, window)
@@ -9,6 +9,8 @@ require ('../node_modules/jquery')($, window)
 # document.ready
 $ ->
   rcm_tb_label_init_onclick()
+  css = new rcm_tb_label_css
+  css.inject()
   # superglobal variable set? if not set it
   if not rcm_tb_label_global('tb_labels_for_message')?
     rcm_tb_label_global_set('tb_labels_for_message', [])
@@ -27,7 +29,7 @@ $ ->
   if window.rcm_contextmenu_register_command
     rcm_contextmenu_register_command 'ctxm_tb_label', rcmail_ctxm_label, $('#tb_label_ctxm_mainmenu'), 'moreacts', 'after', true
   # single message displayed?
-  labels_for_message = rcm_tb_label_global('tb_labels_for_message')
+  labels_for_message = tb_labels_for_message
   if labels_for_message
     labelbox_parent = $('div.message-headers')
     # larry skin
@@ -64,18 +66,23 @@ $ ->
   rcmail.addEventListener 'responsebeforerefresh', (p) ->
     # recent_flags env is set in php thunderbird_labels::check_recent_flags()
     if p.response.env.recent_flags?
+      default_flags = ['SEEN', 'UNSEEN', 'ANSWERED', 'FLAGGED', 'DELETED', 'DRAFT', 'RECENT', 'NONJUNK', 'JUNK']
       $.each p.response.env.recent_flags, (uid, flags) ->
-        unset_labels = [1..5]
+        message = rcmail.env.messages[uid]
+        if typeof message.flags.tb_labels is 'object'
+          unset_labels = message.flags.tb_labels
+        else
+          unset_labels = ['LABEL1', 'LABEL2', 'LABEL3', 'LABEL4', 'LABEL5']
         $.each flags, (flagname, flagvalue) ->
-          if flagvalue and flagname.indexOf('label') is 0
-            label_no = parseInt flagname.replace('label', '')
-            rcm_tb_label_flag_msgs [ uid ], label_no
-            pos = jQuery.inArray(label_no, unset_labels)
+          flagname = flagname.toUpperCase()
+          if flagvalue and jQuery.inArray(flagname, default_flags) == -1
+            rcm_tb_label_flag_msgs [ uid ], flagname
+            pos = jQuery.inArray(flagname, unset_labels)
             if pos > -1
               unset_labels.splice pos, 1
-        $.each unset_labels, (idx, label_no) ->
-          console.log("unset", uid, label_no)
-          rcm_tb_label_unflag_msgs [ uid ], label_no
+        $.each unset_labels, (idx, label_name) ->
+          console.log("unset", uid, label_name)
+          rcm_tb_label_unflag_msgs [ uid ], label_name
     return
 
   # -- add my submenu to roundcubes UI (for roundcube classic only?)

@@ -1,4 +1,82 @@
-var rcm_tb_label_create_popupmenu, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_init_onclick, rcm_tb_label_insert, rcm_tb_label_submenu, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set, rcmail_tb_label_menu;
+var rcm_tb_label_create_popupmenu, rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_init_onclick, rcm_tb_label_insert, rcm_tb_label_submenu, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set, rcmail_tb_label_menu,
+  __slice = [].slice;
+
+String.prototype.format = function() {
+  var args;
+  args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+  return this.replace(/{(\d+)}/g, function(match, number) {
+    if (number < args.length) {
+      return args[number];
+    } else {
+      return match;
+    }
+  });
+};
+
+rcm_tb_label_css = (function() {
+  function rcm_tb_label_css() {
+    this.default_colors = {
+      'bg': '#8CC',
+      'fg': '#880000',
+      'light': '#800',
+      'box': '#882200'
+    };
+    this.label_colors = {
+      'LABEL1': {
+        'bg': '#FCC',
+        'fg': '#FF0000',
+        'light': '#f00',
+        'box': '#FF2200'
+      },
+      'LABEL2': {
+        'bg': '#FC3',
+        'fg': '#FF9900',
+        'light': '#f90',
+        'box': '#FF9900'
+      },
+      'LABEL3': {
+        'bg': '#3C3',
+        'fg': '#009900',
+        'light': '#090',
+        'box': '#00CC00'
+      },
+      'LABEL4': {
+        'bg': '#99F',
+        'fg': '#3333FF',
+        'light': '#0CF',
+        'box': '#0CF'
+      },
+      'LABEL5': {
+        'bg': '#C9C',
+        'fg': '#993399',
+        'light': '#B6F',
+        'box': '#FF33FF'
+      }
+    };
+  }
+
+  rcm_tb_label_css.prototype.generate = function() {
+    var colors, css, escaped_label_name, label_name, _ref;
+    css = '';
+    _ref = this.label_colors;
+    for (label_name in _ref) {
+      colors = _ref[label_name];
+      escaped_label_name = 'tb_label_' + label_name;
+      css += "table.{0}\n{\n  background-color: {1};\n}".format(escaped_label_name, colors.bg);
+      css += "#messagelist tr.{0} td,\n#messagelist tr.{0} td a,\nspan.{0},\n.records-table tr.selected td span.{0}\n{\n  color: {1} !important;\n}\n\n.toolbarmenu li.{0},\n.toolbarmenu li.{0} a.active\n{\n  color: {2};\n}".format(escaped_label_name, colors.fg, colors.light);
+      css += "#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}".format(escaped_label_name, colors.fg);
+      css += "div#labelbox span.box_{0}\n{\n  background-color: {1};\n}".format(escaped_label_name, colors.box);
+    }
+    return css;
+  };
+
+  rcm_tb_label_css.prototype.inject = function() {
+    return $("<style>").prop("type", "text/css").html(this.generate()).appendTo("head");
+  };
+
+  return rcm_tb_label_css;
+
+})();
 
 rcm_tb_label_insert = function(uid, row) {
   var idx, message, rowobj, spanobj;
@@ -16,11 +94,11 @@ rcm_tb_label_insert = function(uid, row) {
       });
       if (rcmail.env.tb_label_style === 'bullets') {
         for (idx in message.flags.tb_labels) {
-          spanobj.append('<span class="label' + message.flags.tb_labels[idx] + '">&#8226;</span>');
+          spanobj.append('<span class="tb_label_' + message.flags.tb_labels[idx] + '">&#8226;</span>');
         }
       } else {
         for (idx in message.flags.tb_labels) {
-          rowobj.addClass('label' + message.flags.tb_labels[idx]);
+          rowobj.addClass('tb_label_' + message.flags.tb_labels[idx]);
         }
       }
     }
@@ -62,6 +140,7 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
   if (!flag_uids.length) {
     return;
   }
+  console.log(flag_uids, toggle_label_no, onoff);
   preview_frame = $('#messagecontframe');
   labels_for_message = rcm_tb_label_global('tb_labels_for_message');
   if (preview_frame.length) {
@@ -77,16 +156,16 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
   if (headers_table.length) {
     if (onoff === true) {
       if (rcmail.env.tb_label_style === 'bullets') {
-        label_box.append('<span class="tb_label_span' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>');
+        label_box.append('<span class="box_tb_label_' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>');
       } else {
-        headers_table.addClass('label' + toggle_label_no);
+        headers_table.addClass('tb_label_' + toggle_label_no);
       }
       labels_for_message.push(toggle_label_no);
     } else {
       if (rcmail.env.tb_label_style === 'bullets') {
-        label_box.find('span.tb_label_span' + toggle_label_no).remove();
+        label_box.find('span.box_tb_label_' + toggle_label_no).remove();
       } else {
-        headers_table.removeClass('label' + toggle_label_no);
+        headers_table.removeClass('tb_label_' + toggle_label_no);
       }
       pos = jQuery.inArray(toggle_label_no, labels_for_message);
       if (pos > -1) {
@@ -113,17 +192,17 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
       rowobj = $(row.obj);
       spanobj = rowobj.find('td.subject span.tb_label_dots');
       if (rcmail.env.tb_label_style === 'bullets') {
-        spanobj.append('<span class="label' + toggle_label_no + '">&#8226;</span>');
+        spanobj.append('<span class="tb_label_' + toggle_label_no + '">&#8226;</span>');
       } else {
-        rowobj.addClass('label' + toggle_label_no);
+        rowobj.addClass('tb_label_' + toggle_label_no);
       }
       message.flags.tb_labels.push(toggle_label_no);
     } else {
       rowobj = $(row.obj);
       if (rcmail.env.tb_label_style === 'bullets') {
-        rowobj.find('td.subject span.tb_label_dots span.label' + toggle_label_no).remove();
+        rowobj.find('td.subject span.tb_label_dots span.tb_label_' + toggle_label_no).remove();
       } else {
-        rowobj.removeClass('label' + toggle_label_no);
+        rowobj.removeClass('tb_label_' + toggle_label_no);
       }
       pos = jQuery.inArray(toggle_label_no, message.flags.tb_labels);
       if (pos > -1) {
@@ -158,24 +237,25 @@ rcm_tb_label_init_onclick = function() {
     cur_a.unbind('click');
     cur_a.click(function() {
       var first_message, first_toggle_mode, flag_uids, from, lock, selection, str_flag_uids, str_unflag_uids, to, toggle_label, toggle_label_no, unflag_uids, unset_all;
-      toggle_label = $(this).parent().attr('class');
-      toggle_label_no = parseInt(toggle_label.replace('label', ''));
+      toggle_label = $(this).parent().data('labelname');
+      console.log('onclick ' + toggle_label);
+      toggle_label_no = toggle_label;
       selection = rcm_tb_label_get_selection();
       if (!selection.length) {
         return;
       }
-      from = toggle_label_no;
-      to = toggle_label_no + 1;
+      from = 1;
+      to = 2;
       unset_all = false;
-      if (toggle_label_no === 0) {
+      if (toggle_label === 'LABEL0') {
         from = 1;
         to = 6;
         unset_all = true;
       }
       i = from;
       while (i < to) {
-        toggle_label = 'label' + i;
-        toggle_label_no = i;
+        toggle_label = 'LABEL' + i;
+        toggle_label_no = toggle_label;
         first_toggle_mode = 'on';
         if (rcmail.env.messages) {
           first_message = rcmail.env.messages[selection[0]];
@@ -258,13 +338,15 @@ rcmail_ctxm_label_set = function(which) {
 /*
 Version: 1.2.0
 Author: Michael Kefeder
-https:#github.com/mike-kfed/rcmail-thunderbird-labels
+https://github.com/mike-kfed/rcmail-thunderbird-labels
  */
 
 
 $(function() {
-  var labelbox_parent, labels_for_message;
+  var css, labelbox_parent, labels_for_message;
   rcm_tb_label_init_onclick();
+  css = new rcm_tb_label_css;
+  css.inject();
   if (rcm_tb_label_global('tb_labels_for_message') == null) {
     rcm_tb_label_global_set('tb_labels_for_message', []);
   }
@@ -284,7 +366,7 @@ $(function() {
   if (window.rcm_contextmenu_register_command) {
     rcm_contextmenu_register_command('ctxm_tb_label', rcmail_ctxm_label, $('#tb_label_ctxm_mainmenu'), 'moreacts', 'after', true);
   }
-  labels_for_message = rcm_tb_label_global('tb_labels_for_message');
+  labels_for_message = tb_labels_for_message;
   if (labels_for_message) {
     labelbox_parent = $('div.message-headers');
     if (!labelbox_parent.length) {
@@ -311,24 +393,31 @@ $(function() {
     }
   });
   rcmail.addEventListener('responsebeforerefresh', function(p) {
+    var default_flags;
     if (p.response.env.recent_flags != null) {
+      default_flags = ['SEEN', 'UNSEEN', 'ANSWERED', 'FLAGGED', 'DELETED', 'DRAFT', 'RECENT', 'NONJUNK', 'JUNK'];
       $.each(p.response.env.recent_flags, function(uid, flags) {
-        var unset_labels;
-        unset_labels = [1, 2, 3, 4, 5];
+        var message, unset_labels;
+        message = rcmail.env.messages[uid];
+        if (typeof message.flags.tb_labels === 'object') {
+          unset_labels = message.flags.tb_labels;
+        } else {
+          unset_labels = ['LABEL1', 'LABEL2', 'LABEL3', 'LABEL4', 'LABEL5'];
+        }
         $.each(flags, function(flagname, flagvalue) {
-          var label_no, pos;
-          if (flagvalue && flagname.indexOf('label') === 0) {
-            label_no = parseInt(flagname.replace('label', ''));
-            rcm_tb_label_flag_msgs([uid], label_no);
-            pos = jQuery.inArray(label_no, unset_labels);
+          var pos;
+          flagname = flagname.toUpperCase();
+          if (flagvalue && jQuery.inArray(flagname, default_flags) === -1) {
+            rcm_tb_label_flag_msgs([uid], flagname);
+            pos = jQuery.inArray(flagname, unset_labels);
             if (pos > -1) {
               return unset_labels.splice(pos, 1);
             }
           }
         });
-        return $.each(unset_labels, function(idx, label_no) {
-          console.log("unset", uid, label_no);
-          return rcm_tb_label_unflag_msgs([uid], label_no);
+        return $.each(unset_labels, function(idx, label_name) {
+          console.log("unset", uid, label_name);
+          return rcm_tb_label_unflag_msgs([uid], label_name);
         });
       });
     }

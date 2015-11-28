@@ -16,11 +16,11 @@ rcm_tb_label_insert = (uid, row) ->
       if rcmail.env.tb_label_style == 'bullets'
         # bullets UI style
         for idx of message.flags.tb_labels
-          spanobj.append '<span class="label' + message.flags.tb_labels[idx] + '">&#8226;</span>'
+          spanobj.append '<span class="tb_label_' + message.flags.tb_labels[idx] + '">&#8226;</span>'
       else
         # thunderbird UI style
         for idx of message.flags.tb_labels
-          rowobj.addClass 'label' + message.flags.tb_labels[idx]
+          rowobj.addClass 'tb_label_' + message.flags.tb_labels[idx]
   return
 
 # Problem: mail-preview-pane is an iframe, so referencing global variables does
@@ -64,7 +64,7 @@ rcm_tb_label_global_set = (var_name, value) ->
 rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
   if not flag_uids.length
     return
-
+  console.log(flag_uids, toggle_label_no, onoff)
   preview_frame = $('#messagecontframe')
   labels_for_message = rcm_tb_label_global('tb_labels_for_message')
 
@@ -81,16 +81,16 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
   if headers_table.length
     if onoff == true
       if rcmail.env.tb_label_style == 'bullets'
-        label_box.append '<span class="tb_label_span' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>'
+        label_box.append '<span class="box_tb_label_' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>'
       else
-        headers_table.addClass 'label' + toggle_label_no
+        headers_table.addClass 'tb_label_' + toggle_label_no
       # add to flag list
       labels_for_message.push toggle_label_no
     else
       if rcmail.env.tb_label_style == 'bullets'
-        label_box.find('span.tb_label_span' + toggle_label_no).remove()
+        label_box.find('span.box_tb_label_' + toggle_label_no).remove()
       else
-        headers_table.removeClass 'label' + toggle_label_no
+        headers_table.removeClass 'tb_label_' + toggle_label_no
       pos = jQuery.inArray(toggle_label_no, labels_for_message)
       if pos > -1
         labels_for_message.splice pos, 1
@@ -98,7 +98,6 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
     labels_for_message = jQuery.grep(labels_for_message, (v, k) ->
       return jQuery.inArray(v, labels_for_message) is k
     )
-    console.log('flags after', labels_for_message)
     rcm_tb_label_global_set('tb_labels_for_message', labels_for_message)
     # write global variable
   # exit function when in detail mode. when preview is active keep going
@@ -115,18 +114,18 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
       rowobj = $(row.obj)
       spanobj = rowobj.find('td.subject span.tb_label_dots')
       if rcmail.env.tb_label_style == 'bullets'
-        spanobj.append '<span class="label' + toggle_label_no + '">&#8226;</span>'
+        spanobj.append '<span class="tb_label_' + toggle_label_no + '">&#8226;</span>'
       else
-        rowobj.addClass 'label' + toggle_label_no
+        rowobj.addClass 'tb_label_' + toggle_label_no
       # add to flag list
       message.flags.tb_labels.push toggle_label_no
     else
       # remove colors
       rowobj = $(row.obj)
       if rcmail.env.tb_label_style == 'bullets'
-        rowobj.find('td.subject span.tb_label_dots span.label' + toggle_label_no).remove()
+        rowobj.find('td.subject span.tb_label_dots span.tb_label_' + toggle_label_no).remove()
       else
-        rowobj.removeClass 'label' + toggle_label_no
+        rowobj.removeClass 'tb_label_' + toggle_label_no
       # remove from flag list
       pos = jQuery.inArray(toggle_label_no, message.flags.tb_labels)
       if pos > -1
@@ -158,23 +157,23 @@ rcm_tb_label_init_onclick = ->
     # TODO check if click event is defined instead of unbinding?
     cur_a.unbind 'click'
     cur_a.click ->
-      toggle_label = $(this).parent().attr('class')
-      toggle_label_no = parseInt(toggle_label.replace('label', ''))
+      toggle_label = $(this).parent().data('labelname')
+      toggle_label_no = toggle_label
       selection = rcm_tb_label_get_selection()
       if !selection.length
         return
-      from = toggle_label_no
-      to = toggle_label_no + 1
+      from = 1
+      to = 2
       unset_all = false
       # special case flag 0 means remove all flags
-      if toggle_label_no == 0
+      if toggle_label == 'LABEL0'
         from = 1
         to = 6
         unset_all = true
       i = from
       while i < to
-        toggle_label = 'label' + i
-        toggle_label_no = i
+        toggle_label = 'LABEL' + i
+        toggle_label_no = toggle_label
         # compile list of unflag and flag msgs and then send command
         # Thunderbird modifies multiple message flags like it did the first in the selection
         # e.g. first message has flag1, you click flag1, every message select loses flag1,
