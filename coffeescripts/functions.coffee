@@ -28,8 +28,14 @@ rcm_tb_label_insert = (uid, row) ->
 # and when needed adjust the pointer to the main window object.
 rcm_tb_label_find_main_window = ->
   ms = $('#mainscreen')
+  login_form = $('#login-form')
   preview_frame = $('#messagecontframe')
   popup_window = $('body.extwin')
+  # login form means no mainscreen current window is okay
+  if login_form.length
+    return window
+  # by default use current window
+  w = window
   # i have a mainscreen and preview_frame
   # this means i run in the main window
   if ms.length and preview_frame.length
