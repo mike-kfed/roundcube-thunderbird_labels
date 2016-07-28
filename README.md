@@ -21,10 +21,8 @@
   * Italian (italiano)
   * Spanish (español)
   * Ukranian (українська)
+  * Brazilian Portuguese (português do Brasil)
 * screenshot: http://rcmail-thunderbird-labels.googlecode.com/files/screenshot.png
-
-### TODO
-- allow users to have an arbitrary number of labels
 
 ### INSTALL
 1. unpack to plugins directory

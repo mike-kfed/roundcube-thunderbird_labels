@@ -1,7 +1,8 @@
-v1.1.x
+v1.2.0
 ---
 - javascript now created from coffeescript
 - fixed issue 20: AJAX reloads should also show changed labels
+- filhocf pull request: Brazilian Portuguese translation
 
 v1.1.3
 ---
