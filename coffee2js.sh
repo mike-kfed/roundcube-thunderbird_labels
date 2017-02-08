@@ -8,5 +8,8 @@ then
 	exit 1
 fi
 
-cat coffeescripts/*.coffee | coffee --compile --stdio -b -p |grep -v require\( > tb_label.js
+cat coffeescripts/main.coffee coffeescripts/css.coffee coffeescripts/functions.coffee coffeescripts/menu.coffee | \
+	coffee --compile --stdio -b -p |grep -v require\( > tb_label.js
+cat coffeescripts/contextmenu.coffee | \
+	coffee --compile --stdio -b -p |grep -v require\( > tb_label_contextmenu.js
 
