@@ -74,7 +74,6 @@ class thunderbird_labels extends rcube_plugin
 			// JS function "set_flags" => PHP function "set_flags"
 			$this->register_action('plugin.thunderbird_labels.set_flags', array($this, 'set_flags'));
 
-
 			if (method_exists($this, 'require_plugin')
 				&& in_array('contextmenu', $this->rc->config->get('plugins'))
 				&& $this->require_plugin('contextmenu')
@@ -242,13 +241,29 @@ class thunderbird_labels extends rcube_plugin
 
 	public function show_tb_label_contextmenu($args)
 	{
+		$this->include_script('tb_label_contextmenu.js');
 		#$this->api->output->add_label('copymessage.copyingmessage');
 
+		// deactivated, no clue how to do submenus in contextmenuplugin
+		/*
 		$li = html::tag('li',
-		  array('class' => 'submenu'),
-		  '<span>'.rcube::Q($this->gettext('tb_label_contextmenu_title')).'</span>' . $this->_gen_label_submenu($args, 'tb_label_ctxm_submenu'));
-		$out .= html::tag('ul', array('id' => 'tb_label_ctxm_mainmenu'), $li);
-		$this->api->output->add_footer(html::div(array('style' => 'display: none;'), $out));
+			array('role' => 'menuitem', 'class' => 'submenu'),
+			$this->api->output->button(array(
+				'label' => rcube::Q($this->gettext('tb_label_contextmenu_title')),
+				'content' => '<span class="icon">'.rcube::Q($this->gettext('tb_label_contextmenu_title')).'</span>',
+				#'content' => '<span class="icon">[Labels]</span><span class="right-arrow"></span>',
+				'command' => "some.test.comma.nd",
+				'onclick' => "UI.toggle_popup('tb_label_popup', event); return false",
+				'type' => 'link',
+				'class' => 'icon more',
+				'tabindex' => '-1',
+				'aria-disabled' => 'true'
+			)));
+		*/
+		//. $this->_gen_label_submenu($args, 'tb_label_ctxm_submenu'));
+		$out = html::tag('ul', array('id' => 'tb_label_ctxm_mainmenu', 'role' => "menu"), $li);
+		$out = $this->_gen_label_submenu($args, 'tb_label_ctxm_mainmenu'); # FIXME directly appended to context menu, makes it super long = bad
+		$this->api->output->add_footer(html::div(array('style' => 'display: none;', 'aria-hidden' => 'true'), $out));
 	}
 
 	private function _gen_label_submenu($args, $id)
@@ -258,12 +273,23 @@ class thunderbird_labels extends rcube_plugin
 		for ($i = 0; $i < 6; $i++)
 		{
 			$separator = ($i == 0)? ' separator_below' :'';
-			$out .= '<li class="label'.$i.$separator.
+			$out .= html::tag('li',
+				null,
+				$this->api->output->button(array(
+					'label' => rcube::Q($i.' '.$custom_labels["LABEL$i"]),
+					'command' => 'test.comm.and',
+					'type' => 'link',
+					'class' => 'label'.$i.$separator,
+					'aria-disabled' => 'true'
+					)
+				)
+			);
+			/*$out .= '<li class="label'.$i.$separator.
 			  ' ctxm_tb_label"><a href="#ctxm_tb_label" class="active" onclick="rcmail_ctxm_label_set('.$i.')"><span>'.
 			  $i.' '.$custom_labels[$i].
-			  '</span></a></li>';
+			  '</span></a></li>';*/
 		}
-		$out = html::tag('ul', array('class' => 'popupmenu toolbarmenu folders', 'id' => $id), $out);
+		$out = html::tag('ul', array('id' => $id, 'role' => 'menu'), $out);
 		return $out;
 	}
 
