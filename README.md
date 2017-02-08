@@ -29,6 +29,9 @@
 ### INSTALL
 1. unpack to plugins directory
 2. add `, 'thunderbird_labels'` to `$rcmail_config['plugins']` in main.inc.php
+3. if you run a custom skin, e.g. `silver` then you should also symlink or copy the skins folder
+   of the plugin to the corresponding skins name, for the example given:
+   `ln -s plugins/thunderbird_labels/skins/larry plugins/thunderbird_labels/skins/silver`
 
 ### CONFIGURE
 
