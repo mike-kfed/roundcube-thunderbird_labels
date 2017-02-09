@@ -5,7 +5,7 @@ Version: 1.2.0
 Author: Michael Kefeder
 https://github.com/mike-kfed/rcmail-thunderbird-labels
  */
-var rcm_tb_label_create_popupmenu, rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_init_onclick, rcm_tb_label_insert, rcm_tb_label_submenu, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set, rcmail_tb_label_menu,
+var rcm_tb_label_create_popupmenu, rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_init_onclick, rcm_tb_label_insert, rcm_tb_label_onclick, rcm_tb_label_submenu, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set, rcmail_tb_label_menu,
   slice = [].slice;
 
 
@@ -280,8 +280,10 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
   if (headers_table.length) {
     if (onoff === true) {
       if (rcmail.env.tb_label_style === 'bullets') {
+        label_box.find('span.box_tb_label_' + toggle_label_no).remove();
         label_box.append('<span class="box_tb_label_' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>');
       } else {
+        headers_table.removeClass('tb_label_' + toggle_label_no);
         headers_table.addClass('tb_label_' + toggle_label_no);
       }
       labels_for_message.push(toggle_label_no);
@@ -358,30 +360,30 @@ rcm_tb_label_init_onclick = function() {
   while (i < 6) {
     cur_a = $('#tb_label_popup li.label' + i + ' a');
     cur_a.unbind('click');
-    cur_a.click(rcm_tb_label_onclick);
+    cur_a.click(function(ev) {
+      return rcm_tb_label_onclick($(ev.target));
+    });
     i++;
   }
 };
 
-rcm_tb_label_onclick = function() {
-  var first_message, first_toggle_mode, flag_uids, from, lock, selection, str_flag_uids, str_unflag_uids, to, toggle_label, toggle_label_no, unflag_uids, unset_all;
-  toggle_label = $(this).parent().data('labelname');
-  toggle_label_no = toggle_label;
+rcm_tb_label_onclick = function(me) {
+  var selection, toggle_label, toggle_labels, unset_all;
+  toggle_label = me.parent().data('labelname');
   selection = rcm_tb_label_get_selection();
   if (!selection.length) {
     return;
   }
-  from = 1;
-  to = 2;
-  unset_all = false;
   if (toggle_label === 'LABEL0') {
-    from = 1;
-    to = 6;
+    toggle_labels = ['LABEL1', 'LABEL2', 'LABEL3', 'LABEL4', 'LABEL5'];
     unset_all = true;
+  } else {
+    toggle_labels = [toggle_label];
+    unset_all = false;
   }
-  i = from;
-  while (i < to) {
-    toggle_label = 'LABEL' + i;
+  toggle_labels.forEach(function(v, k, arr) {
+    var first_message, first_toggle_mode, flag_uids, lock, str_flag_uids, str_unflag_uids, toggle_label_no, unflag_uids;
+    toggle_label = v;
     toggle_label_no = toggle_label;
     first_toggle_mode = 'on';
     if (rcmail.env.messages) {
@@ -426,8 +428,7 @@ rcm_tb_label_onclick = function() {
       flag_uids = [];
     }
     if (flag_uids.length === 0 && unflag_uids.length === 0) {
-      i++;
-      continue;
+      return;
     }
     str_flag_uids = flag_uids.join(',');
     str_unflag_uids = unflag_uids.join(',');
@@ -435,9 +436,9 @@ rcm_tb_label_onclick = function() {
     rcmail.http_request('plugin.thunderbird_labels.set_flags', '_flag_uids=' + str_flag_uids + '&_unflag_uids=' + str_unflag_uids + '&_mbox=' + urlencode(rcmail.env.mailbox) + '&_toggle_label=' + toggle_label, lock);
     rcm_tb_label_flag_msgs(flag_uids, toggle_label_no);
     rcm_tb_label_unflag_msgs(unflag_uids, toggle_label_no);
-    i++;
-  }
+  });
 };
+
 rcmail_ctxm_label = function(command, el, pos) {
   var cur_a, selection;
   selection = rcmail.message_list ? rcmail.message_list.get_selection() : [];
