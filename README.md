@@ -21,7 +21,7 @@
   * Italian (italiano)
   * Spanish (español)
   * Ukranian (українська)
-* screenshot: http://rcmail-thunderbird-labels.googlecode.com/files/screenshot.png
+* [screenshot](http://mike-kfed.github.io/rcmail-thunderbird-labels/)
 
 ### TODO
 - allow users to have an arbitrary number of labels
