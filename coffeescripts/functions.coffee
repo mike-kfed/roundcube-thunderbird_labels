@@ -162,7 +162,11 @@ rcm_tb_label_init_onclick = ->
     cur_a = $('#tb_label_popup li.label' + i + ' a')
     # TODO check if click event is defined instead of unbinding?
     cur_a.unbind 'click'
-    cur_a.click ->
+    cur_a.click rcm_tb_label_onclick
+    i++
+  return
+
+rcm_tb_label_onclick = ->
       toggle_label = $(this).parent().data('labelname')
       toggle_label_no = toggle_label
       selection = rcm_tb_label_get_selection()
@@ -232,8 +236,6 @@ rcm_tb_label_init_onclick = ->
         rcm_tb_label_unflag_msgs unflag_uids, toggle_label_no
         i++
       return
-    i++
-  return
 
 rcmail_ctxm_label = (command, el, pos) ->
   # my code works only on selected rows, contextmenu also on unselected
