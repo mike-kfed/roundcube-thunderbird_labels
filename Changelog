@@ -1,8 +1,9 @@
-v1.2.0
+v1.3.0
 ---
 - javascript now created from coffeescript
 - fixed issue 20: AJAX reloads should also show changed labels
 - filhocf pull request: Brazilian Portuguese translation
+- fixed issue 27: contextmenu integration works again
 
 v1.1.3
 ---
