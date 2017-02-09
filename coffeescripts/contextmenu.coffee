@@ -1,7 +1,7 @@
 # thunderbird_labels integration for contextmenu plugin (with help from Philip Weir)
 rcmail.addEventListener 'contextmenu_init', (menu) ->
   # dentify the folder list context menu
-  console.log(menu.menu_name);
+  #console.log(menu.menu_name);
   if menu.menu_name == 'messagelist'
     menu.addEventListener 'init', (p) ->
       if p.ref.menu_name == 'tb_label_popup'
@@ -24,10 +24,10 @@ rcmail.addEventListener 'contextmenu_init', (menu) ->
           if (p.ref.list_object)
             p.ref.list_selection(false, prev_sel)
             rcmail.env.display_next = prev_display_next
-          undefined
+          return
 
       $(p.ref.container).append(labels)
-      undefined
+      return
 
     menu.addEventListener 'activate', (p) ->
       # the thunderbird_labels commands do not match the pattern used in the Roundcube core so some custom handling is needed.
@@ -57,13 +57,14 @@ rcmail.addEventListener 'contextmenu_init', (menu) ->
 
               ref.timers['submenu_show'] = window.setTimeout (a, e) ->
                   ref.submenu(a, e)
-                  undefined
+                  return
                 , ref.mouseover_timeout, $(p.el), e
+              return
 
             $(p.el).mouseout (e) ->
               $(this).blur()
               clearTimeout(ref.timers['submenu_show'])
-              undefined
+              return
 
         # contextmenu plugin automatically hide things that it does not think look like Roundcube commands
         # make sure the labels command is visible
@@ -71,4 +72,4 @@ rcmail.addEventListener 'contextmenu_init', (menu) ->
 
         # check if the command is enabled
         rcmail.commands['plugin.thunderbird_labels.rcm_tb_label_submenu']
-  undefined
+  return
