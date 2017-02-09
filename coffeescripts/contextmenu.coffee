@@ -9,7 +9,7 @@ rcmail.addEventListener 'contextmenu_init', (menu) ->
         # intercept the menu creation and build our own
         $(p.ref.container).children('ul').remove();
         labels = $('#tb_label_popup ul').clone();
-        $(labels).find('a').click () ->
+        $(labels).find('a').click (ev) ->
           # thunderbird_labels commands need message selection information
           # code to simulate message selection taken from contextmenu core
           if (p.ref.list_object)
@@ -20,7 +20,7 @@ rcmail.addEventListener 'contextmenu_init', (menu) ->
 
             prev_sel = p.ref.list_selection(true);
           # the thunderbird_labels command
-          rcm_tb_label_onclick()
+          rcm_tb_label_onclick($(ev.target))
           if (p.ref.list_object)
             p.ref.list_selection(false, prev_sel)
             rcmail.env.display_next = prev_display_next

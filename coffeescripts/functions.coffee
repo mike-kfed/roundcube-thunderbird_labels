@@ -87,8 +87,10 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
   if headers_table.length
     if onoff == true
       if rcmail.env.tb_label_style == 'bullets'
+        label_box.find('span.box_tb_label_' + toggle_label_no).remove() # remove existing ones before adding
         label_box.append '<span class="box_tb_label_' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>'
       else
+        headers_table.removeClass 'tb_label_' + toggle_label_no # remove before adding
         headers_table.addClass 'tb_label_' + toggle_label_no
       # add to flag list
       labels_for_message.push toggle_label_no
@@ -162,27 +164,25 @@ rcm_tb_label_init_onclick = ->
     cur_a = $('#tb_label_popup li.label' + i + ' a')
     # TODO check if click event is defined instead of unbinding?
     cur_a.unbind 'click'
-    cur_a.click rcm_tb_label_onclick
+    cur_a.click (ev) ->
+      rcm_tb_label_onclick $(ev.target)
     i++
   return
 
-rcm_tb_label_onclick = ->
-      toggle_label = $(this).parent().data('labelname')
-      toggle_label_no = toggle_label
+rcm_tb_label_onclick = (me) ->
+      toggle_label = me.parent().data('labelname')
       selection = rcm_tb_label_get_selection()
       if !selection.length
         return
-      from = 1
-      to = 2
-      unset_all = false
       # special case flag 0 means remove all flags
       if toggle_label == 'LABEL0'
-        from = 1
-        to = 6
+        toggle_labels = ['LABEL1', 'LABEL2', 'LABEL3', 'LABEL4', 'LABEL5'] # FIXME dynamic!
         unset_all = true
-      i = from
-      while i < to
-        toggle_label = 'LABEL' + i
+      else
+        toggle_labels = [toggle_label,]
+        unset_all = false
+      toggle_labels.forEach (v, k, arr) ->
+        toggle_label = v
         toggle_label_no = toggle_label
         # compile list of unflag and flag msgs and then send command
         # Thunderbird modifies multiple message flags like it did the first in the selection
@@ -224,8 +224,7 @@ rcm_tb_label_onclick = ->
           flag_uids = []
         # skip sending flags to backend that are not set anywhere
         if flag_uids.length == 0 and unflag_uids.length == 0
-          i++
-          continue
+          return # basically a "continue"
         str_flag_uids = flag_uids.join(',')
         str_unflag_uids = unflag_uids.join(',')
         lock = rcmail.set_busy(true, 'loading')
@@ -234,7 +233,7 @@ rcm_tb_label_onclick = ->
         # remove/add classes and tb labels from messages in JS
         rcm_tb_label_flag_msgs flag_uids, toggle_label_no
         rcm_tb_label_unflag_msgs unflag_uids, toggle_label_no
-        i++
+        return # from click
       return
 
 rcmail_ctxm_label = (command, el, pos) ->
