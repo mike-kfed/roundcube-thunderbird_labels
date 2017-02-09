@@ -19,5 +19,14 @@ $labels['label3'] = 'Personal';
 $labels['label4'] = 'Por Hacer';
 $labels['label5'] = 'Más Tarde';
 
+$labels['tb_label_options'] = 'Configuración Etiquetas Thunderbird';
+$labels['tb_label_enable_option'] = 'Activar Etiquetas';
+$labels['tb_label_enable_shortcuts_option'] = 'Activar atajos de teclado';
+$labels['tb_label_button_label'] = 'Etiquetas';
+$labels['tb_label_button_title'] = 'Establecer etiquetas sobre mensajes';
+$labels['tb_label_contextmenu_title'] = 'Etiquetas';
+$labels['tb_label_style_option'] = "Presentación de etiquetas";
+$labels['tb_label_label'] = "Etiqueta";
+
 $messages = array();
 
