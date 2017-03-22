@@ -3,7 +3,7 @@ require ('../node_modules/roundcube')(rcmail)
 
 rcmail_tb_label_menu = (p) ->
   if typeof rcmail_ui == 'undefined'
-    rcmail_ui = UI
+    window.rcmail_ui = UI
   if !rcmail_ui.check_tb_popup()
     rcmail_ui.tb_label_popup_add()
   # Show the popup menu with tags
@@ -17,7 +17,7 @@ rcmail_tb_label_menu = (p) ->
 # Shows the submenu of thunderbird labels
 rcm_tb_label_submenu = (p) ->
   if typeof rcmail_ui == 'undefined'
-    rcmail_ui = UI
+    window.rcmail_ui = UI
   # setup onclick and active/non active classes
   rcm_tb_label_create_popupmenu()
   # -- create sensible popup, using roundcubes internals
