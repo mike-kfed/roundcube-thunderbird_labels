@@ -20,6 +20,7 @@
   * Latvian (latviešu)
   * Italian (italiano)
   * Spanish (español)
+  * Slovak (Slovenčina)
   * Ukranian (українська)
 * [screenshot](http://mike-kfed.github.io/rcmail-thunderbird-labels/)
 
