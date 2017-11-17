@@ -20,9 +20,12 @@
   * Latvian (latviešu)
   * Italian (italiano)
   * Spanish (español)
+  * Slovak (Slovenčina)
   * Ukranian (українська)
   * Brazilian Portuguese (português do Brasil)
-* screenshot: http://rcmail-thunderbird-labels.googlecode.com/files/screenshot.png
+  * Portuguese (português)
+  * Dutch (Nederlands)
+* [screenshot](http://mike-kfed.github.io/rcmail-thunderbird-labels/)
 
 ### INSTALL
 1. unpack to plugins directory

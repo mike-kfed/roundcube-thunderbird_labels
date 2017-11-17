@@ -6,6 +6,11 @@ v1.3.0
 - fixed issue 27: contextmenu integration works again
 - petrkle pull request: Slovak translation
 
+v1.1.4
+---
+- added Dutch translation by Tobias Geerinckx-Rice
+- added Portuguese translation by Pedro Ribeiro
+
 v1.1.3
 ---
 - dsoares pull request: Enable or disable the plugin button on message selection.
