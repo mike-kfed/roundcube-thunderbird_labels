@@ -22,6 +22,9 @@
   * Spanish (español)
   * Slovak (Slovenčina)
   * Ukranian (українська)
+  * Brazilian Portuguese (português do Brasil)
+  * Portuguese (português)
+  * Dutch (Nederlands)
 * [screenshot](http://mike-kfed.github.io/rcmail-thunderbird-labels/)
 
 ### TODO
