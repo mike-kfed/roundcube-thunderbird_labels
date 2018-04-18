@@ -1,11 +1,3 @@
-/**
-* Author:
-* Michael Kefeder
-* http://code.google.com/p/rcmail-thunderbird-labels/
-*
-* CSS is Based on a patch for roundcube 0.3 I found a long time ago
-*/
-
 #tb_label_popuplink {
   background-image: url(thunderbird_32.png);
   /*background-repeat: repeat;*/

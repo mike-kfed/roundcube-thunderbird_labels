@@ -6,7 +6,7 @@
  *
  * @version 1.2.0
  * @author Michael Kefeder
- * @url https://github.com/mike-kfed/rcmail-thunderbird-labels
+ * @url https://github.com/mike-kfed/roundcube-thunderbird_labels
  */
 class thunderbird_labels extends rcube_plugin
 {

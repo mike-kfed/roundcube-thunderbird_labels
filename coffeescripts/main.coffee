@@ -1,7 +1,7 @@
 ###
 Version: 1.2.0
 Author: Michael Kefeder
-https://github.com/mike-kfed/rcmail-thunderbird-labels
+https://github.com/mike-kfed/roundcube-thunderbird_labels
 ###
 
 require ('../node_modules/jquery')($, window)
