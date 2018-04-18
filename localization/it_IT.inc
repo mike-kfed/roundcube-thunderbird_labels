@@ -2,7 +2,6 @@
 /**
 * Author:
 * Samuele Tognini <samuele@samuele.netsons.org>
-* http://code.google.com/p/rcmail-thunderbird-labels/
 */
 
 $labels = array();

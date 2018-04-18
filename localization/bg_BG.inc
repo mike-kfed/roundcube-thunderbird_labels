@@ -2,7 +2,6 @@
 /**
 * Author:
 * Deyan Stoykov
-* http://code.google.com/p/rcmail-thunderbird-labels/
 */
 
 $labels = array();

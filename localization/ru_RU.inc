@@ -2,7 +2,6 @@
 /**
 * Author:
 * Николай Николай
-* http://code.google.com/p/rcmail-thunderbird-labels/
 */
 
 $labels = array();

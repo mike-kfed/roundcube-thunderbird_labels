@@ -2,7 +2,6 @@
 /**
 * Author:
 * Lluís Forns Puigmartí
-* http://code.google.com/p/rcmail-thunderbird-labels/
 */
 
 $labels = array();

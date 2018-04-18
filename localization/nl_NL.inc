@@ -2,7 +2,6 @@
 /**
 * Author:
 * Tobias Geerinckx-Rice
-* https://github.com/mike-kfed/rcmail-thunderbird-labels
 */
 
 $labels = array();
