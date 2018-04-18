@@ -25,7 +25,7 @@
   * Brazilian Portuguese (português do Brasil)
   * Portuguese (português)
   * Dutch (Nederlands)
-* [screenshot](http://mike-kfed.github.io/rcmail-thunderbird-labels/)
+* [screenshot](http://mike-kfed.github.io/roundcube-thunderbird_labels/)
 
 ### TODO
 - allow users to have an arbitrary number of labels
@@ -49,7 +49,7 @@ See config.inc.php
 
 ### Author
 Michael Kefeder
-https://github.com/mike-kfed/rcmail-thunderbird-labels
+https://github.com/mike-kfed/roundcube-thunderbird_labels
 
 ### History
 This plugin is based on a patch I found for roundcube 0.3 a long time ago.
