@@ -3,7 +3,7 @@
 /*
 Version: 1.2.0
 Author: Michael Kefeder
-https://github.com/mike-kfed/rcmail-thunderbird-labels
+https://github.com/mike-kfed/roundcube-thunderbird_labels
  */
 var rcm_tb_label_create_popupmenu, rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_init_onclick, rcm_tb_label_insert, rcm_tb_label_onclick, rcm_tb_label_submenu, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set, rcmail_tb_label_menu,
   slice = [].slice;
