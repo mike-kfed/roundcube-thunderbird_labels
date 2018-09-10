@@ -26,11 +26,11 @@
 }
 
 span.tb_label_dots {
-  position: absolute;
+  /* position: absolute;
+  display: block; */
   right: 3px;
   top: 1.2em;
   height: 0px;
-  display: block;
 }
 
 /* hack for firefox : doesnt display the bullets at the correct height */

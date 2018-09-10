@@ -156,19 +156,20 @@ span.label5
 
 span.tb_label_dots {
   height: 0px;
-  display: block;
-  position: absolute;
+  /* display: block;
+  position: absolute; */
   right: 3px;
   top: 1.2em;
 }
 
 /* hack for firefox : doesnt display the bullets at the correct height */
+/*
 @-moz-document url-prefix() {
   span.tb_label_dots {
     top: -12px;
   }
 }
-
+*/
 span.tb_label_dots span {
   font-size: 32px;
   vertical-align: middle;
