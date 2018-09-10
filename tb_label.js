@@ -245,8 +245,11 @@ rcm_tb_label_find_main_window = function() {
   }
   ms = w.document.getElementById('mainscreen');
   if (!ms) {
-    console.log("mainscreen still not found");
-    return null;
+    ms = w.document.getElementById('messagelist-content');
+    if (!ms) {
+      console.log("mainscreen still not found");
+      return null;
+    }
   }
   return w;
 };

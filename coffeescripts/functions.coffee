@@ -56,8 +56,11 @@ rcm_tb_label_find_main_window = ->
     w = window
   ms = w.document.getElementById('mainscreen')
   if not ms
-    console.log("mainscreen still not found")
-    return null
+    # maybe roundcube >=1.4beta elastic skin
+    ms = w.document.getElementById('messagelist-content')
+    if not ms
+      console.log("mainscreen still not found")
+      return null
   return w
 
 rcm_tb_label_global = (var_name) ->
