@@ -14,15 +14,13 @@ rcmail.addEventListener 'contextmenu_init', (menu) ->
           # code to simulate message selection taken from contextmenu core
           if (p.ref.list_object)
             prev_display_next = rcmail.env.display_next;
-
-            if (!(p.ref.list_object.selection.length == 1 && p.ref.list_object.in_selection(rcmail.env.context_menu_source_id)))
+            list_obj = rcmail[p.ref.list_object]
+            if (!(list_obj.selection.length == 1 && list_obj.in_selection(rcmail.env.context_menu_source_id)))
               rcmail.env.display_next = false
 
-            prev_sel = p.ref.list_selection(true);
           # the thunderbird_labels command
           rcm_tb_label_onclick($(ev.target))
           if (p.ref.list_object)
-            p.ref.list_selection(false, prev_sel)
             rcmail.env.display_next = prev_display_next
           return
 

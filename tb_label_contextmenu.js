@@ -7,17 +7,16 @@ rcmail.addEventListener('contextmenu_init', function(menu) {
         $(p.ref.container).children('ul').remove();
         labels = $('#tb_label_popup ul').clone();
         $(labels).find('a').click(function(ev) {
-          var prev_display_next, prev_sel;
+          var list_obj, prev_display_next;
           if (p.ref.list_object) {
             prev_display_next = rcmail.env.display_next;
-            if (!(p.ref.list_object.selection.length === 1 && p.ref.list_object.in_selection(rcmail.env.context_menu_source_id))) {
+            list_obj = rcmail[p.ref.list_object];
+            if (!(list_obj.selection.length === 1 && list_obj.in_selection(rcmail.env.context_menu_source_id))) {
               rcmail.env.display_next = false;
             }
-            prev_sel = p.ref.list_selection(true);
           }
           rcm_tb_label_onclick($(ev.target));
           if (p.ref.list_object) {
-            p.ref.list_selection(false, prev_sel);
             rcmail.env.display_next = prev_display_next;
           }
         });
