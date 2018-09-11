@@ -466,6 +466,9 @@ rcmail_tb_label_menu = function(p) {
   if (typeof rcmail_ui === 'undefined') {
     window.rcmail_ui = UI;
   }
+  if (!rcmail_ui.show_popup) {
+    return;
+  }
   if (!rcmail_ui.check_tb_popup()) {
     rcmail_ui.tb_label_popup_add();
   }
@@ -480,6 +483,9 @@ rcmail_tb_label_menu = function(p) {
 rcm_tb_label_submenu = function(p) {
   if (typeof rcmail_ui === 'undefined') {
     window.rcmail_ui = UI;
+  }
+  if (!rcmail_ui.show_popup) {
+    return;
   }
   rcm_tb_label_create_popupmenu();
   if (!rcmail_ui.check_tb_popup()) {
