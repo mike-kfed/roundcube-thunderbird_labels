@@ -374,10 +374,9 @@ class thunderbird_labels extends rcube_plugin
 	{
 		// Other plugins may use template parsing method, this causes more than one render_page execution.
 		// We have to make sure the menu is added only once (when content is going to be written to client).
-		if (!$args['write']) {
-			echo "not rwasfwe";
+		// roundcube < 1.4 does not send 'write' key
+		if (array_key_exists('write', $args) && !$args['write'])
 			return;
-		}
 
 		$html = $this->template_file2html($this->rc->task);
 		if ($html)
