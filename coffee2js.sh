@@ -10,6 +10,7 @@ fi
 
 cat coffeescripts/main.coffee coffeescripts/css.coffee coffeescripts/functions.coffee coffeescripts/menu.coffee | \
 	coffee --compile --stdio -b -p |grep -v require\( > tb_label.js
-cat coffeescripts/contextmenu.coffee | \
-	coffee --compile --stdio -b -p |grep -v require\( > tb_label_contextmenu.js
+# no longer needed
+#cat coffeescripts/contextmenu.coffee | \
+#	coffee --compile --stdio -b -p |grep -v require\( > tb_label_contextmenu.js
 

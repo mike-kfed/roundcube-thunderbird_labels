@@ -231,29 +231,9 @@ class thunderbird_labels extends rcube_plugin
 
 	public function show_tb_label_contextmenu($args)
 	{
-		$this->include_script('tb_label_contextmenu.js');
-		#$this->api->output->add_label('copymessage.copyingmessage');
-
-		// deactivated, no clue how to do submenus in contextmenuplugin
-		/*
-		$li = html::tag('li',
-			array('role' => 'menuitem', 'class' => 'submenu'),
-			$this->api->output->button(array(
-				'label' => rcube::Q($this->gettext('tb_label_contextmenu_title')),
-				'content' => '<span class="icon">'.rcube::Q($this->gettext('tb_label_contextmenu_title')).'</span>',
-				#'content' => '<span class="icon">[Labels]</span><span class="right-arrow"></span>',
-				'command' => "some.test.comma.nd",
-				'onclick' => "UI.toggle_popup('tb_label_popup', event); return false",
-				'type' => 'link',
-				'class' => 'icon more',
-				'tabindex' => '-1',
-				'aria-disabled' => 'true'
-			)));
-		*/
-		//. $this->_gen_label_submenu($args, 'tb_label_ctxm_submenu'));
-		$out = html::tag('ul', array('id' => 'tb_label_ctxm_mainmenu', 'role' => "menu"), $li);
-		$out = $this->_gen_label_submenu($args, 'tb_label_ctxm_mainmenu'); # FIXME directly appended to context menu, makes it super long = bad
-		$this->api->output->add_footer(html::div(array('style' => 'display: none;', 'aria-hidden' => 'true'), $out));
+		# no longer needed
+		#$this->include_script('tb_label_contextmenu.js');
+		return null;
 	}
 
 	private function _gen_label_submenu($args, $id)
