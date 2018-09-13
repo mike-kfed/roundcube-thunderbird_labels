@@ -64,5 +64,9 @@ div#labelbox span {
 }
 
 #sections-table tbody #rcmrowthunderbird_labels td.section:before {
-	content: " "
+	content: " ";
+}
+
+.toolbar a.button.tb-label:before {
+	content: "\f507";  /* user-tag */
 }
