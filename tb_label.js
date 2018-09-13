@@ -5,7 +5,7 @@ Version: 1.2.0
 Author: Michael Kefeder
 https://github.com/mike-kfed/roundcube-thunderbird_labels
  */
-var rcm_tb_label_create_popupmenu, rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_init_onclick, rcm_tb_label_insert, rcm_tb_label_onclick, rcm_tb_label_submenu, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set, rcmail_tb_label_menu,
+var rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_init_onclick, rcm_tb_label_insert, rcm_tb_label_menuclick, rcm_tb_label_onclick, rcm_tb_label_submenu, rcm_tb_label_toggle, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set,
   slice = [].slice;
 
 
@@ -53,9 +53,11 @@ $(function() {
   });
   rcmail.addEventListener('init', function(evt) {
     rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, rcmail.env.uid);
+    rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_onclick', rcm_tb_label_menuclick, rcmail.env.uid);
     if (rcmail.message_list) {
       rcmail.message_list.addEventListener('select', function(list) {
         rcmail.enable_command('plugin.thunderbird_labels.rcm_tb_label_submenu', list.get_selection().length > 0);
+        rcmail.enable_command('plugin.thunderbird_labels.rcm_tb_label_onclick', list.get_selection().length > 0);
       });
     }
   });
@@ -93,16 +95,16 @@ $(function() {
     rcube_mail_ui.prototype.tb_label_popup_add = function() {
       var add, obj;
       add = {
-        tb_label_popup: {
-          id: 'tb_label_popup'
+        "tb-label-menu": {
+          id: 'tb-label-menu'
         }
       };
       this.popups = $.extend(this.popups, add);
-      obj = $('#' + this.popups.tb_label_popup.id);
+      obj = $('#' + this.popups['tb-label-menu'].id);
       if (obj.length) {
-        this.popups.tb_label_popup.obj = obj;
+        this.popups['tb-label-menu'].obj = obj;
       } else {
-        delete this.popups.tb_label_popup;
+        delete this.popups['tb-label-menu'];
       }
     };
   }
@@ -370,9 +372,21 @@ rcm_tb_label_init_onclick = function() {
   }
 };
 
+rcm_tb_label_menuclick = function(labelname, obj, ev) {
+  console.log(labelname);
+  console.log(obj);
+  console.log(ev);
+  return rcm_tb_label_toggle(labelname);
+};
+
 rcm_tb_label_onclick = function(me) {
-  var selection, toggle_label, toggle_labels, unset_all;
+  var toggle_label;
   toggle_label = me.parent().data('labelname');
+  return rcm_tb_label_toggle(toggle_label);
+};
+
+rcm_tb_label_toggle = function(toggle_label) {
+  var selection, toggle_labels, unset_all;
   selection = rcm_tb_label_get_selection();
   if (!selection.length) {
     return;
@@ -461,8 +475,7 @@ rcmail_ctxm_label_set = function(which) {
   rcmail.tb_label_no = which;
 };
 
-
-rcmail_tb_label_menu = function(p) {
+rcm_tb_label_submenu = function(p, obj, ev) {
   if (typeof rcmail_ui === 'undefined') {
     window.rcmail_ui = UI;
   }
@@ -473,43 +486,9 @@ rcmail_tb_label_menu = function(p) {
     rcmail_ui.tb_label_popup_add();
   }
   if (typeof rcmail_ui.show_popupmenu === 'undefined') {
-    rcmail_ui.show_popup('tb_label_popup');
-  } else {
-    rcmail_ui.show_popupmenu('tb_label_popup');
-  }
-  return false;
-};
-
-rcm_tb_label_submenu = function(p) {
-  if (typeof rcmail_ui === 'undefined') {
-    window.rcmail_ui = UI;
-  }
-  if (!rcmail_ui.show_popup) {
     return;
-  }
-  rcm_tb_label_create_popupmenu();
-  if (!rcmail_ui.check_tb_popup()) {
-    rcmail_ui.tb_label_popup_add();
-  }
-  if (typeof rcmail_ui.show_popupmenu === 'undefined') {
-    rcmail_ui.show_popup('tb_label_popup');
   } else {
-    rcmail_ui.show_popupmenu('tb_label_popup');
+    rcmail_ui.show_popupmenu('tb-label-menu', ev);
   }
   return false;
-};
-
-rcm_tb_label_create_popupmenu = function() {
-  var cur_a, i, selection;
-  i = 0;
-  while (i < 6) {
-    cur_a = $('li.label' + i + ' a');
-    selection = rcm_tb_label_get_selection();
-    if (selection.length === 0) {
-      cur_a.removeClass('active');
-    } else {
-      cur_a.addClass('active');
-    }
-    i++;
-  }
 };

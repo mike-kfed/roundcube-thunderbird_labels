@@ -90,13 +90,13 @@ $ ->
   # -- add my submenu to roundcubes UI (for roundcube classic only?)
   if window.rcube_mail_ui
     rcube_mail_ui::tb_label_popup_add = ->
-      add = tb_label_popup: id: 'tb_label_popup'
+      add = "tb-label-menu": id: 'tb-label-menu'
       @popups = $.extend(@popups, add)
-      obj = $('#' + @popups.tb_label_popup.id)
+      obj = $('#' + @popups['tb-label-menu'].id)
       if obj.length
-        @popups.tb_label_popup.obj = obj
+        @popups['tb-label-menu'].obj = obj
       else
-        delete @popups.tb_label_popup
+        delete @popups['tb-label-menu']
       return
 
   if window.rcube_mail_ui
