@@ -1,3 +1,9 @@
+v1.4beta
+---
+- completely refactored building and injecting the needed popup-menu
+- compatible to roundcube v1.4beta "elastic" skin
+- styling updates to look more like native roundcube
+
 v1.3.0
 ---
 - javascript now created from coffeescript
