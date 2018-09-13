@@ -5,7 +5,7 @@ Version: 1.2.0
 Author: Michael Kefeder
 https://github.com/mike-kfed/roundcube-thunderbird_labels
  */
-var rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_insert, rcm_tb_label_menuclick, rcm_tb_label_onclick, rcm_tb_label_submenu, rcm_tb_label_toggle, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set,
+var rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_insert, rcm_tb_label_menuclick, rcm_tb_label_submenu, rcm_tb_label_toggle, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set,
   slice = [].slice;
 
 
@@ -52,11 +52,11 @@ $(function() {
   });
   rcmail.addEventListener('init', function(evt) {
     rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, rcmail.env.uid);
-    rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_onclick', rcm_tb_label_menuclick, rcmail.env.uid);
+    rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_menuclick', rcm_tb_label_menuclick, rcmail.env.uid);
     if (rcmail.message_list) {
       rcmail.message_list.addEventListener('select', function(list) {
         rcmail.enable_command('plugin.thunderbird_labels.rcm_tb_label_submenu', list.get_selection().length > 0);
-        rcmail.enable_command('plugin.thunderbird_labels.rcm_tb_label_onclick', list.get_selection().length > 0);
+        rcmail.enable_command('plugin.thunderbird_labels.rcm_tb_label_menuclick', list.get_selection().length > 0);
       });
     }
   });
@@ -360,12 +360,6 @@ rcm_tb_label_get_selection = function() {
 
 rcm_tb_label_menuclick = function(labelname, obj, ev) {
   return rcm_tb_label_toggle(labelname);
-};
-
-rcm_tb_label_onclick = function(me) {
-  var toggle_label;
-  toggle_label = me.parent().data('labelname');
-  return rcm_tb_label_toggle(toggle_label);
 };
 
 rcm_tb_label_toggle = function(toggle_label) {

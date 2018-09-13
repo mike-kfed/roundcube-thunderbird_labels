@@ -163,11 +163,6 @@ rcm_tb_label_get_selection = ->
 rcm_tb_label_menuclick = (labelname, obj, ev) ->
   rcm_tb_label_toggle(labelname)
 
-# backwards compatible to old code
-rcm_tb_label_onclick = (me) ->
-  toggle_label = me.parent().data('labelname')
-  rcm_tb_label_toggle(toggle_label)
-
 # actually toggle the label for the selected messages
 rcm_tb_label_toggle = (toggle_label) ->
       selection = rcm_tb_label_get_selection()
