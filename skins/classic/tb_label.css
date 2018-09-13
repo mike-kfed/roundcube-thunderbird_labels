@@ -1,5 +1,5 @@
-#messagetoolbar #tb_label_popuplink,
-#tb_label_popuplink {
+#messagetoolbar a.button.tb-label,
+#messagetoolbar a.buttonPas.tb-label {
   background-image: url(thunderbird_32.png);
   background-repeat: no-repeat;
   width: 32px;
