@@ -34,15 +34,8 @@ div#labelbox span {
     font-weight: bold;
 }
 
-/* icon for settings-section */
-#sections-table tbody #rcmrowthunderbird_labels td.section {
-	background-image: url(thunderbird_24.png);
-	background-position: 3px 3px;
-	background-repeat: no-repeat;
-}
-
 #sections-table tbody #rcmrowthunderbird_labels td.section:before {
-	content: " ";
+	content: "\f507";  /* user-tag */
 }
 
 .toolbar a.button.tb-label:before {
