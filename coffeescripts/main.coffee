@@ -54,10 +54,12 @@ $ ->
   rcmail.addEventListener 'init', (evt) ->
     #rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, true);
     rcmail.register_command 'plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, rcmail.env.uid
+    rcmail.register_command 'plugin.thunderbird_labels.rcm_tb_label_onclick', rcm_tb_label_menuclick, rcmail.env.uid
     # add event-listener to message list
     if rcmail.message_list
       rcmail.message_list.addEventListener 'select', (list) ->
         rcmail.enable_command 'plugin.thunderbird_labels.rcm_tb_label_submenu', list.get_selection().length > 0
+        rcmail.enable_command 'plugin.thunderbird_labels.rcm_tb_label_onclick', list.get_selection().length > 0
         return
     return
 

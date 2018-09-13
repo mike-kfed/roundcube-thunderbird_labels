@@ -57,20 +57,10 @@ class thunderbird_labels extends rcube_plugin
 			);
 			$this->message_tb_labels = array();
 
-			$this->add_button(
-				array(
-					'command' => 'plugin.thunderbird_labels.rcm_tb_label_submenu',
-					'id' => 'tb_label_popuplink',
-					'title' => 'tb_label_button_title',
-					'domain' => $this->ID,
-					'type' => 'link',
-					'content' => $this->gettext('tb_label_button_label'),
-					'class' => 'button buttonPas disabled',
-					'classact' => 'button',
-					),
-				'toolbar'
-			);
 
+			$html = $this->template_file2html('toolbar');
+			if ($html)
+				$this->api->add_content($html, 'toolbar');
 			// JS function "set_flags" => PHP function "set_flags"
 			$this->register_action('plugin.thunderbird_labels.set_flags', array($this, 'set_flags'));
 
@@ -370,22 +360,66 @@ class thunderbird_labels extends rcube_plugin
 		$this->api->output->send();
 	}
 
-	function tb_label_popup()
+	function template_include_markup($tpl_name)
 	{
+		$path = '/' . $this->local_skin_path() . '/includes/' . $tpl_name . '.html';
+		$filepath = slashify($this->home) . $path;
+		if (is_file($filepath) && is_readable($filepath))
+			return "<roundcube:include file=\"$path\" skinpath=\"plugins/thunderbird_labels\" />";
+		return null;
+	}
+
+	function template_file2html($tpl_name)
+	{
+		$tpl_cmd = $this->template_include_markup($tpl_name);
+		if ($tpl_cmd)
+			return $this->template2html($tpl_cmd);
+		return null;
+	}
+
+	function template2html($tpl_code)
+	{
+		if ($this->api->output->type == 'html')
+		{
+			if ($tpl_code)
+			{
+				$this->add_texts('localization/');
+				return $this->rc->output->just_parse($tpl_code);
+			}
+		}
+		return null;
+	}
+
+	function tb_label_popup($args)
+	{
+		// Other plugins may use template parsing method, this causes more than one render_page execution.
+		// We have to make sure the menu is added only once (when content is going to be written to client).
+		if (!$args['write']) {
+			echo "not rwasfwe";
+			return;
+		}
+
+		$html = $this->template_file2html($this->rc->task);
+		if ($html)
+			$this->rc->output->add_footer($html);
+
+		# create a RC template for the popup-menu of tb-labels, make html from it and inject
+		$tpl = '
+	<div id="tb-label-menu" class="popupmenu">
+		<h3 id="aria-label-tb-labelmenu" class="voice"><roundcube:label name="thunderbird_labels.tb_label_button_label" /></h3>
+		<ul class="toolbarmenu listing" role="menu" aria-labelledby="aria-label-tb-labelmenu">';
+		$tpl_end = '</ul></div>';
+		$tpl_menu = '';
 		$custom_labels = $this->rc->config->get('tb_label_custom_labels');
-		$out = '<div id="tb_label_popup" class="popupmenu">
-			<ul class="toolbarmenu">';
 		$i = 0;
 		foreach ($custom_labels as $label_name => $human_readable)
 		{
-			$separator = ($i == 0)? ' separator_below' :'';
-			$out .= '<li class="label'.$i.$separator.'" data-labelname="LABEL'.$i.'"><a href="#" class="active">'.$i.' '.$human_readable.'</a></li>';
+			$tpl_menu .= '<roundcube:button type="link-menuitem" command="plugin.thunderbird_labels.rcm_tb_label_onclick" content="'."$i $human_readable".'" prop="LABEL'.$i.'" classAct="tb-label label'.$i.' inline active" class="tb-label label'.$i.'" data-labelname="LABEL'.$i.'" />';
 			$i++;
 		}
-		$out .= '</ul>
-		</div>';
-		$this->rc->output->add_gui_object('tb_label_popup_obj', 'tb_label_popup');
-		$this->rc->output->add_footer($out);
+		$html = $this->template2html($tpl.$tpl_menu.$tpl_end);
+		if ($html)
+			$this->rc->output->add_footer($html);
 	}
 
 	/* Bastardised hook, actually supposed to modify the list of folders for refresh
@@ -405,11 +439,11 @@ class thunderbird_labels extends rcube_plugin
 			if (empty($_SESSION['list_mod_seq']) || $_SESSION['list_mod_seq'] != $data['HIGHESTMODSEQ']) {
 			   $flags = $RCMAIL->storage->list_flags($mbox_name, explode(',', $uids), $_SESSION['list_mod_seq']);
 			   foreach ($flags as $idx => $row) {
-			       $flags[$idx] = array_change_key_case(array_map('intval', $row));
+				   $flags[$idx] = array_change_key_case(array_map('intval', $row));
 			   }
 			   // remember last HIGHESTMODSEQ value (if supported)
 			   if (!empty($data['HIGHESTMODSEQ'])) {
-			       $_SESSION['list_mod_seq'] = $data['HIGHESTMODSEQ'];
+				   $_SESSION['list_mod_seq'] = $data['HIGHESTMODSEQ'];
 			   }
 
 			   $RCMAIL->output->set_env('recent_flags', $flags);

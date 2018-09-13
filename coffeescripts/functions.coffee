@@ -172,8 +172,17 @@ rcm_tb_label_init_onclick = ->
     i++
   return
 
+rcm_tb_label_menuclick = (labelname, obj, ev) ->
+    console.log(labelname)
+    console.log(obj)
+    console.log(ev)
+    rcm_tb_label_toggle(labelname)
+
 rcm_tb_label_onclick = (me) ->
-      toggle_label = me.parent().data('labelname')
+    toggle_label = me.parent().data('labelname')
+    rcm_tb_label_toggle(toggle_label)
+
+rcm_tb_label_toggle = (toggle_label) ->
       selection = rcm_tb_label_get_selection()
       if !selection.length
         return
