@@ -8,7 +8,6 @@ require ('../node_modules/jquery')($, window)
 
 # document.ready
 $ ->
-  rcm_tb_label_init_onclick()
   css = new rcm_tb_label_css
   css.inject()
   # superglobal variable set? if not set it
@@ -104,7 +103,7 @@ $ ->
       # larry skin doesn't have that variable, popup works automagically, return true
       if typeof @popups == 'undefined'
         return true
-      if @popups.tb_label_popup
+      if @popups['tb-label-menu']
         true
       else
         false

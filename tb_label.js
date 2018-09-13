@@ -5,13 +5,12 @@ Version: 1.2.0
 Author: Michael Kefeder
 https://github.com/mike-kfed/roundcube-thunderbird_labels
  */
-var rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_init_onclick, rcm_tb_label_insert, rcm_tb_label_menuclick, rcm_tb_label_onclick, rcm_tb_label_submenu, rcm_tb_label_toggle, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set,
+var rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_insert, rcm_tb_label_menuclick, rcm_tb_label_onclick, rcm_tb_label_submenu, rcm_tb_label_toggle, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set,
   slice = [].slice;
 
 
 $(function() {
   var css, labelbox_parent, labels_for_message;
-  rcm_tb_label_init_onclick();
   css = new rcm_tb_label_css;
   css.inject();
   if (rcm_tb_label_global('tb_labels_for_message') == null) {
@@ -23,7 +22,7 @@ $(function() {
       k = e.which;
       if (k > 47 && k < 58 || k > 95 && k < 106) {
         label_no = k % 48;
-        cur_a = $('#tb_label_popup li.label' + label_no + ' a');
+        cur_a = $('#tb-label-menu a.label' + label_no);
         if (cur_a) {
           cur_a.click();
         }
@@ -113,7 +112,7 @@ $(function() {
       if (typeof this.popups === 'undefined') {
         return true;
       }
-      if (this.popups.tb_label_popup) {
+      if (this.popups['tb-label-menu']) {
         return true;
       } else {
         return false;
@@ -359,23 +358,7 @@ rcm_tb_label_get_selection = function() {
   return selection;
 };
 
-rcm_tb_label_init_onclick = function() {
-  var cur_a, i;
-  i = 0;
-  while (i < 6) {
-    cur_a = $('#tb_label_popup li.label' + i + ' a');
-    cur_a.unbind('click');
-    cur_a.click(function(ev) {
-      return rcm_tb_label_onclick($(ev.target));
-    });
-    i++;
-  }
-};
-
 rcm_tb_label_menuclick = function(labelname, obj, ev) {
-  console.log(labelname);
-  console.log(obj);
-  console.log(ev);
   return rcm_tb_label_toggle(labelname);
 };
 
@@ -465,7 +448,7 @@ rcmail_ctxm_label = function(command, el, pos) {
   if (!selection.length && rcmail.env.uid) {
     rcmail.message_list.select_row(rcmail.env.uid);
   }
-  cur_a = $('#tb_label_popup li.label' + rcmail.tb_label_no + ' a');
+  cur_a = $('#tb-label-menu a.label' + rcmail.tb_label_no);
   if (cur_a) {
     cur_a.click();
   }

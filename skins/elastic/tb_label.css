@@ -1,25 +1,3 @@
-#tb_label_popuplink {
-  background-image: url(thunderbird_32.png);
-  background-repeat: no-repeat;
-  background-position: 50% 0px;
-  width: 32px;
-  height: 13px;
-  padding: 28px 2px 0px 2px;
-  margin: 0px 5px 0px 5px;
-  overflow: hidden;
-}
-
-#tb_label_popup
-{
-  width: auto;
-  position: absolute;
-}
-
-#tb_label_popup a.active
-{
-  color: inherit; /* fix for firefox */
-}
-
 .toolbarmenu li.label0,
 .toolbarmenu li.label0 a.active
 {

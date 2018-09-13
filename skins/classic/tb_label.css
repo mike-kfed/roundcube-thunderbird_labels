@@ -9,17 +9,6 @@
   text-indent: -5000px;
 }
 
-#tb_label_popup
-{
-  width: auto;
-  position: absolute;
-}
-
-#tb_label_popup a.active
-{
-  color: inherit; /* fix for firefox */
-}
-
 .toolbarmenu li.label0 a
 {
   color: #CCC;

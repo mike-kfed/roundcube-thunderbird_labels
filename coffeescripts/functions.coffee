@@ -153,35 +153,22 @@ rcm_tb_label_unflag_msgs = (unflag_uids, toggle_label_no) ->
   return
 
 # helper function to get selected/active messages
-
 rcm_tb_label_get_selection = ->
   selection = if rcmail.message_list then rcmail.message_list.get_selection() else []
   if selection.length == 0 and rcmail.env.uid
     selection = [ rcmail.env.uid ]
   selection
 
-rcm_tb_label_init_onclick = ->
-  i = 0
-  while i < 6
-    # find the "HTML a tags" of tb-label submenus
-    cur_a = $('#tb_label_popup li.label' + i + ' a')
-    # TODO check if click event is defined instead of unbinding?
-    cur_a.unbind 'click'
-    cur_a.click (ev) ->
-      rcm_tb_label_onclick $(ev.target)
-    i++
-  return
-
+# maps signature of RC hooks
 rcm_tb_label_menuclick = (labelname, obj, ev) ->
-    console.log(labelname)
-    console.log(obj)
-    console.log(ev)
-    rcm_tb_label_toggle(labelname)
+  rcm_tb_label_toggle(labelname)
 
+# backwards compatible to old code
 rcm_tb_label_onclick = (me) ->
-    toggle_label = me.parent().data('labelname')
-    rcm_tb_label_toggle(toggle_label)
+  toggle_label = me.parent().data('labelname')
+  rcm_tb_label_toggle(toggle_label)
 
+# actually toggle the label for the selected messages
 rcm_tb_label_toggle = (toggle_label) ->
       selection = rcm_tb_label_get_selection()
       if !selection.length
@@ -256,7 +243,7 @@ rcmail_ctxm_label = (command, el, pos) ->
     return
   if !selection.length and rcmail.env.uid
     rcmail.message_list.select_row rcmail.env.uid
-  cur_a = $('#tb_label_popup li.label' + rcmail.tb_label_no + ' a')
+  cur_a = $('#tb-label-menu a.label' + rcmail.tb_label_no)
   if cur_a
     cur_a.click()
   return
