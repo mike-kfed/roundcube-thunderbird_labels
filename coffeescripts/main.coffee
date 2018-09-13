@@ -21,7 +21,7 @@ $ ->
       k = e.which
       if k > 47 and k < 58 or k > 95 and k < 106
         label_no = k % 48
-        cur_a = $('#tb_label_popup li.label' + label_no + ' a')
+        cur_a = $('#tb-label-menu a.label' + label_no)
         if cur_a
           cur_a.click()
       return
