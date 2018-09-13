@@ -1,11 +1,6 @@
-#tb_label_popuplink {
+.toolbar a.button.tb-label {
   background-image: url(thunderbird_32.png);
-  /*background-repeat: repeat;*/
   background-position: 50% 0px;
-  width: 32px;
-  height: 13px;
-  padding: 28px 2px 0px 2px;
-  margin: 0px 5px 0px 5px;
 }
 
 #tb_label_popup
