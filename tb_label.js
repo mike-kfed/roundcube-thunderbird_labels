@@ -316,10 +316,13 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
       }
       rowobj = $(row.obj);
       spanobj = rowobj.find('td.subject span.tb_label_dots');
-      if (rcmail.env.tb_label_style === 'bullets') {
-        spanobj.append('<span class="tb_label_' + toggle_label_no + '">&#8226;</span>');
-      } else {
-        rowobj.addClass('tb_label_' + toggle_label_no);
+      var dotobj = rowobj.find("td.subject span.tb_label_dots span.tb_label_"+toggle_label_no);
+      if (dotobj == 'undefined' || dotobj.length == 0) {
+        if (rcmail.env.tb_label_style === 'bullets') {
+          spanobj.append('<span class="tb_label_' + toggle_label_no + '">&#8226;</span>');
+        } else {
+          rowobj.addClass('tb_label_' + toggle_label_no);
+        }
       }
       message.flags.tb_labels.push(toggle_label_no);
     } else {
