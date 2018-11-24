@@ -67,7 +67,7 @@ $(function() {
         var message, unset_labels;
         message = rcmail.env.messages[uid];
         if (typeof message.flags.tb_labels === 'object') {
-          unset_labels = message.flags.tb_labels;
+          unset_labels = Array.from(message.flags.tb_labels);
         } else {
           unset_labels = ['LABEL1', 'LABEL2', 'LABEL3', 'LABEL4', 'LABEL5'];
         }
@@ -264,7 +264,6 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
   if (!flag_uids.length) {
     return;
   }
-  console.log(flag_uids, toggle_label_no, onoff);
   preview_frame = $('#messagecontframe');
   labels_for_message = rcm_tb_label_global('tb_labels_for_message');
   if (preview_frame.length) {
