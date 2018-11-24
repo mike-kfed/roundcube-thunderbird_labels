@@ -71,7 +71,7 @@ $ ->
       $.each p.response.env.recent_flags, (uid, flags) ->
         message = rcmail.env.messages[uid]
         if typeof message.flags.tb_labels is 'object'
-          unset_labels = message.flags.tb_labels
+          unset_labels = Array.from(message.flags.tb_labels)  # don't use reference!
         else
           unset_labels = ['LABEL1', 'LABEL2', 'LABEL3', 'LABEL4', 'LABEL5']
         $.each flags, (flagname, flagvalue) ->

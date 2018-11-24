@@ -73,7 +73,7 @@ rcm_tb_label_global_set = (var_name, value) ->
 rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
   if not flag_uids.length
     return
-  console.log(flag_uids, toggle_label_no, onoff)
+  #console.log(flag_uids, toggle_label_no, onoff)
   preview_frame = $('#messagecontframe')
   labels_for_message = rcm_tb_label_global('tb_labels_for_message')
 
