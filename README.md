@@ -6,7 +6,7 @@
 * Label of a message can be changed/set exactly like in Thunderbird
 * Keyboard shortcuts on keys 0-5 work like in Thunderbird
 * Integrates into contextmenu plugin when available
-* Works for skins classic and larry
+* Works for skins *classic*, *larry* and *elastic*
 * currently available translations:
   * English
   * French (Français)
