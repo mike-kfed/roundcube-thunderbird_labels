@@ -1,3 +1,8 @@
+v1.3.1
+---
+- fixed issue 40: repeated dots when IMAP server returns full email list on
+  refresh
+
 v1.3.0
 ---
 - javascript now created from coffeescript
