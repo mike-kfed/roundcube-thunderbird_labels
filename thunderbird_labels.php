@@ -170,22 +170,22 @@ class thunderbird_labels extends rcube_plugin
 			);
 		}
 
-		$key = 'tb_label_custom_labels';
-		if (!in_array($key, $dont_override)
+		if (!in_array('tb_label_custom_labels', $dont_override)
 			&& $this->rc->config->get('tb_label_modify_labels'))
 		{
-			$old = $this->rc->config->get($key);
-			for($i=1; $i<=5; $i++)
+			$custom_labels = $this->rc->config->get('tb_label_custom_labels');
+			foreach ($custom_labels as $key => $value)
 			{
 				$input = new html_inputfield(array(
-					'name' => $key.$i,
-					'id' => $key.$i,
+					'name' => "custom_$key",
+					'id' => "custom_$key",
 					'type' => 'text',
 					'autocomplete' => 'off',
-					'value' => $old[$i]));
+					'title' => $this->getText(strtolower($key)), # shows default value on hover
+					'value' => $value));
 
-				$args['blocks']['tb_label']['options'][$key.$i] = array(
-					'title' => $this->gettext('tb_label_label')." ".$i,
+				$args['blocks']['tb_label']['options']["option_$key"] = array(
+					'title' => $key,
 					'content' => $input->show()
 					);
 			}
@@ -199,7 +199,6 @@ class thunderbird_labels extends rcube_plugin
 	{
 		if ($args['section'] != 'thunderbird_labels')
 		  return $args;
-
 
 		$this->load_config();
 		$dont_override = (array) $this->rc->config->get('dont_override', array());
@@ -217,12 +216,12 @@ class thunderbird_labels extends rcube_plugin
 			&& $this->rc->config->get('tb_label_modify_labels'))
 		{
 			$args['prefs']['tb_label_custom_labels'] = array(
-			0 => $this->gettext('label0'),
-			1 => rcube_utils::get_input_value('tb_label_custom_labels1', rcube_utils::INPUT_POST),
-			2 => rcube_utils::get_input_value('tb_label_custom_labels2', rcube_utils::INPUT_POST),
-			3 => rcube_utils::get_input_value('tb_label_custom_labels3', rcube_utils::INPUT_POST),
-			4 => rcube_utils::get_input_value('tb_label_custom_labels4', rcube_utils::INPUT_POST),
-			5 => rcube_utils::get_input_value('tb_label_custom_labels5', rcube_utils::INPUT_POST)
+			'LABEL0' => $this->gettext('label0'),
+			'LABEL1' => rcube_utils::get_input_value('custom_LABEL1', rcube_utils::INPUT_POST),
+			'LABEL2' => rcube_utils::get_input_value('custom_LABEL2', rcube_utils::INPUT_POST),
+			'LABEL3' => rcube_utils::get_input_value('custom_LABEL3', rcube_utils::INPUT_POST),
+			'LABEL4' => rcube_utils::get_input_value('custom_LABEL4', rcube_utils::INPUT_POST),
+			'LABEL5' => rcube_utils::get_input_value('custom_LABEL5', rcube_utils::INPUT_POST)
 			);
 		}
 
