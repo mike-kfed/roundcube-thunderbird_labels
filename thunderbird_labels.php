@@ -334,8 +334,12 @@ class thunderbird_labels extends rcube_plugin
 			|| !is_array($flag_uids))
 			return false;
 
-		$imap->set_flag($flag_uids, $toggle_label, $mbox);
-		$imap->set_flag($unflag_uids, "UN$toggle_label", $mbox);
+
+		# prepend $ again to be compatible to Thunderbird (roundcube removes $ from labels)
+		$imap->set_flag($flag_uids, "UN$toggle_label", $mbox); # quickhack to remove non-$ labels
+		$imap->set_flag($flag_uids, "\$$toggle_label", $mbox);
+		$imap->set_flag($unflag_uids, "UN$toggle_label", $mbox); # quickhack to remove non-$ labels
+		$imap->set_flag($unflag_uids, "UN\$$toggle_label", $mbox);
 
 		$this->api->output->send();
 	}
