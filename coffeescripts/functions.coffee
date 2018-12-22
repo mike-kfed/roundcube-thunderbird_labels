@@ -15,12 +15,12 @@ rcm_tb_label_insert = (uid, row) ->
         a - b
       if rcmail.env.tb_label_style == 'bullets'
         # bullets UI style
-        for idx of message.flags.tb_labels
-          spanobj.append '<span class="tb_label_' + message.flags.tb_labels[idx] + '">&#8226;</span>'
+        for label_name in message.flags.tb_labels
+          spanobj.append '<span class="tb_label_' + label_name + '" title="' + i18n_label(label_name) + '">&#8226;</span>'
       else
         # thunderbird UI style
-        for idx of message.flags.tb_labels
-          rowobj.addClass 'tb_label_' + message.flags.tb_labels[idx]
+        for label_name in message.flags.tb_labels
+          rowobj.addClass 'tb_label_' + label_name
   return
 
 # Problem: mail-preview-pane is an iframe, so referencing global variables does
@@ -69,6 +69,12 @@ rcm_tb_label_global = (var_name) ->
 rcm_tb_label_global_set = (var_name, value) ->
   rcm_tb_label_find_main_window()[var_name] = value
 
+escape_jquery_selector = (str) ->
+  str.replace('&', '\\&')
+
+i18n_label = (label_name) ->
+  custom_str = rcmail.env.tb_label_custom_labels[label_name]
+  (if custom_str then custom_str else label_name)  # TODO: convert punycode
 
 rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
   if not flag_uids.length
@@ -90,8 +96,8 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
   if headers_table.length
     if onoff == true
       if rcmail.env.tb_label_style == 'bullets'
-        label_box.find('span.box_tb_label_' + toggle_label_no).remove() # remove existing ones before adding
-        label_box.append '<span class="box_tb_label_' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>'
+        label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove() # remove existing ones before adding
+        label_box.append '<span class="box_tb_label_' + toggle_label_no + '">' + i18n_label(toggle_label_no) + '</span>'
       else
         headers_table.removeClass 'tb_label_' + toggle_label_no # remove before adding
         headers_table.addClass 'tb_label_' + toggle_label_no
@@ -99,7 +105,7 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
       labels_for_message.push toggle_label_no
     else
       if rcmail.env.tb_label_style == 'bullets'
-        label_box.find('span.box_tb_label_' + toggle_label_no).remove()
+        label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove()
       else
         headers_table.removeClass 'tb_label_' + toggle_label_no
       pos = jQuery.inArray(toggle_label_no, labels_for_message)
@@ -125,7 +131,7 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
       rowobj = $(row.obj)
       spanobj = rowobj.find('td.subject span.tb_label_dots')
       if rcmail.env.tb_label_style == 'bullets'
-        spanobj.append '<span class="tb_label_' + toggle_label_no + '">&#8226;</span>'
+        spanobj.append '<span class="tb_label_' + toggle_label_no + '" title="' + i18n_label(toggle_label_no) + '">&#8226;</span>'
       else
         rowobj.addClass 'tb_label_' + toggle_label_no
       # add to flag list

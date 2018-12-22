@@ -5,7 +5,7 @@ Version: 1.2.0
 Author: Michael Kefeder
 https://github.com/mike-kfed/roundcube-thunderbird_labels
  */
-var rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_insert, rcm_tb_label_menuclick, rcm_tb_label_submenu, rcm_tb_label_toggle, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set,
+var escape_jquery_selector, i18n_label, rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_insert, rcm_tb_label_menuclick, rcm_tb_label_submenu, rcm_tb_label_toggle, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set,
   slice = [].slice;
 
 
@@ -199,7 +199,7 @@ rcm_tb_label_css = (function() {
 })();
 
 rcm_tb_label_insert = function(uid, row) {
-  var idx, message, rowobj, spanobj;
+  var i, j, label_name, len, len1, message, ref, ref1, rowobj, spanobj;
   if (typeof rcmail.env === 'undefined' || typeof rcmail.env.messages === 'undefined') {
     return;
   }
@@ -213,12 +213,16 @@ rcm_tb_label_insert = function(uid, row) {
         return a - b;
       });
       if (rcmail.env.tb_label_style === 'bullets') {
-        for (idx in message.flags.tb_labels) {
-          spanobj.append('<span class="tb_label_' + message.flags.tb_labels[idx] + '">&#8226;</span>');
+        ref = message.flags.tb_labels;
+        for (i = 0, len = ref.length; i < len; i++) {
+          label_name = ref[i];
+          spanobj.append('<span class="tb_label_' + label_name + '" title="' + i18n_label(label_name) + '">&#8226;</span>');
         }
       } else {
-        for (idx in message.flags.tb_labels) {
-          rowobj.addClass('tb_label_' + message.flags.tb_labels[idx]);
+        ref1 = message.flags.tb_labels;
+        for (j = 0, len1 = ref1.length; j < len1; j++) {
+          label_name = ref1[j];
+          rowobj.addClass('tb_label_' + label_name);
         }
       }
     }
@@ -263,6 +267,20 @@ rcm_tb_label_global_set = function(var_name, value) {
   return rcm_tb_label_find_main_window()[var_name] = value;
 };
 
+escape_jquery_selector = function(str) {
+  return str.replace('&', '\\&');
+};
+
+i18n_label = function(label_name) {
+  var custom_str;
+  custom_str = rcmail.env.tb_label_custom_labels[label_name];
+  if (custom_str) {
+    return custom_str;
+  } else {
+    return label_name;
+  }
+};
+
 rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
   var headers_table, label_box, labels_for_message, pos, preview_frame;
   if (!flag_uids.length) {
@@ -283,8 +301,8 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
   if (headers_table.length) {
     if (onoff === true) {
       if (rcmail.env.tb_label_style === 'bullets') {
-        label_box.find('span.box_tb_label_' + toggle_label_no).remove();
-        label_box.append('<span class="box_tb_label_' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>');
+        label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove();
+        label_box.append('<span class="box_tb_label_' + toggle_label_no + '">' + i18n_label(toggle_label_no) + '</span>');
       } else {
         headers_table.removeClass('tb_label_' + toggle_label_no);
         headers_table.addClass('tb_label_' + toggle_label_no);
@@ -292,7 +310,7 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
       labels_for_message.push(toggle_label_no);
     } else {
       if (rcmail.env.tb_label_style === 'bullets') {
-        label_box.find('span.box_tb_label_' + toggle_label_no).remove();
+        label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove();
       } else {
         headers_table.removeClass('tb_label_' + toggle_label_no);
       }
@@ -320,7 +338,7 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
       rowobj = $(row.obj);
       spanobj = rowobj.find('td.subject span.tb_label_dots');
       if (rcmail.env.tb_label_style === 'bullets') {
-        spanobj.append('<span class="tb_label_' + toggle_label_no + '">&#8226;</span>');
+        spanobj.append('<span class="tb_label_' + toggle_label_no + '" title="' + i18n_label(toggle_label_no) + '">&#8226;</span>');
       } else {
         rowobj.addClass('tb_label_' + toggle_label_no);
       }
