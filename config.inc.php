@@ -9,4 +9,6 @@
   $rcmail_config['tb_label_modify_labels'] = true;
   // style for UI: 'bullets' or 'thunderbird'
   $rcmail_config['tb_label_style'] = "bullets";
+  // custom hidden flags
+  $rcmail_config['tb_label_hidden_flags'] = array();
 
