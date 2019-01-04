@@ -466,7 +466,7 @@ class thunderbird_labels extends rcube_plugin
 			'\\*',  // means labels allowed
 			'*',  // means labels allowed roundcubed
 		];
-		// TODO: merge flags that should be hidden from tblabels config
+		$default_flags = array_unique(array_merge($default_flags, $this->rc->config->get('tb_label_hidden_flags', [])));
 
 		/* TODO: flagnames contain $ sign, or umlauts (imap-utf-7 encoded meanging & will be in the name)
 		* smart way to recode those characters and create valid variable names?
