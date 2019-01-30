@@ -184,7 +184,7 @@ rcm_tb_label_css = (function() {
       escaped_label_name = 'tb_label_' + label_name;
       css += "table.{0}\n{\n  background-color: {1};\n}".format(escaped_label_name, colors.bg);
       css += "#messagelist tr.{0} td,\n#messagelist tr.{0} td a,\nspan.{0},\n.records-table tr.selected td span.{0}\n{\n  color: {1} !important;\n}\n\n.toolbarmenu li.{0},\n.toolbarmenu li.{0} a.active\n{\n  color: {2};\n}".format(escaped_label_name, colors.fg, colors.light);
-      css += "#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}".format(escaped_label_name, colors.fg);
+      css += "#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}".format(escaped_label_name, colors.bg);
       css += "div#labelbox span.box_{0}\n{\n  background-color: {1};\n}".format(escaped_label_name, colors.box);
     }
     return css;
