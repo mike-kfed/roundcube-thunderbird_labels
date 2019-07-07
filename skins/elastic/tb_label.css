@@ -4,6 +4,31 @@
   color: #EEE;
 }
 
+.toolbarmenu li .label1
+{
+  color: #FF0000 !important;
+}
+
+.toolbarmenu li .label2
+{
+  color: #FF9900 !important;
+}
+
+.toolbarmenu li .label3
+{
+  color: #009900 !important;
+}
+
+.toolbarmenu li .label4
+{
+  color: #3333FF !important;
+}
+
+.toolbarmenu li .label5
+{
+  color: #993399 !important;
+}
+
 span.tb_label_dots {
   height: 10px;
   margin-left: 18px;
