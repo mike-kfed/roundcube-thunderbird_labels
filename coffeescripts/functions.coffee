@@ -31,6 +31,7 @@ rcm_tb_label_find_main_window = ->
   login_form = $('#login-form')
   preview_frame = $('#messagecontframe')
   popup_window = $('body.extwin')
+  elastic_popup_window = $('body.action-show')
   # login form means no mainscreen current window is okay
   if login_form.length
     return window
@@ -45,7 +46,7 @@ rcm_tb_label_find_main_window = ->
   if not ms.length and not preview_frame.length
     # TODO check for $('body.iframe') might make it more reliable
     w = window.parent
-  if popup_window.length
+  if popup_window.length or elastic_popup_window.length
     # i run in a popup window (message to be shown in popup can be configured
     # by the user)
     # theoretically we should point at window.opener, but this is unreliable,
@@ -59,6 +60,8 @@ rcm_tb_label_find_main_window = ->
     # maybe roundcube >=1.4beta elastic skin
     ms = w.document.getElementById('messagelist-content')
     if not ms
+      if elastic_popup_window.length
+        return w
       console.log("mainscreen still not found")
       return null
   return w

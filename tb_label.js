@@ -230,11 +230,12 @@ rcm_tb_label_insert = function(uid, row) {
 };
 
 rcm_tb_label_find_main_window = function() {
-  var login_form, ms, popup_window, preview_frame, w;
+  var elastic_popup_window, login_form, ms, popup_window, preview_frame, w;
   ms = $('#mainscreen');
   login_form = $('#login-form');
   preview_frame = $('#messagecontframe');
   popup_window = $('body.extwin');
+  elastic_popup_window = $('body.action-show');
   if (login_form.length) {
     return window;
   }
@@ -245,13 +246,16 @@ rcm_tb_label_find_main_window = function() {
   if (!ms.length && !preview_frame.length) {
     w = window.parent;
   }
-  if (popup_window.length) {
+  if (popup_window.length || elastic_popup_window.length) {
     w = window;
   }
   ms = w.document.getElementById('mainscreen');
   if (!ms) {
     ms = w.document.getElementById('messagelist-content');
     if (!ms) {
+      if (elastic_popup_window.length) {
+        return w;
+      }
       console.log("mainscreen still not found");
       return null;
     }
