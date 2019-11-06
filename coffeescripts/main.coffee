@@ -8,7 +8,6 @@ require ('../node_modules/jquery')($, window)
 
 # document.ready
 $ ->
-  rcm_tb_label_init_onclick()
   css = new rcm_tb_label_css
   css.inject()
   # superglobal variable set? if not set it
@@ -21,7 +20,7 @@ $ ->
       k = e.which
       if k > 47 and k < 58 or k > 95 and k < 106
         label_no = k % 48
-        cur_a = $('#tb_label_popup li.label' + label_no + ' a')
+        cur_a = $('#tb-label-menu a.label' + label_no)
         if cur_a
           cur_a.click()
       return
@@ -54,10 +53,12 @@ $ ->
   rcmail.addEventListener 'init', (evt) ->
     #rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, true);
     rcmail.register_command 'plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, rcmail.env.uid
+    rcmail.register_command 'plugin.thunderbird_labels.rcm_tb_label_menuclick', rcm_tb_label_menuclick, rcmail.env.uid
     # add event-listener to message list
     if rcmail.message_list
       rcmail.message_list.addEventListener 'select', (list) ->
         rcmail.enable_command 'plugin.thunderbird_labels.rcm_tb_label_submenu', list.get_selection().length > 0
+        rcmail.enable_command 'plugin.thunderbird_labels.rcm_tb_label_menuclick', list.get_selection().length > 0
         return
     return
 
@@ -88,13 +89,13 @@ $ ->
   # -- add my submenu to roundcubes UI (for roundcube classic only?)
   if window.rcube_mail_ui
     rcube_mail_ui::tb_label_popup_add = ->
-      add = tb_label_popup: id: 'tb_label_popup'
+      add = "tb-label-menu": id: 'tb-label-menu'
       @popups = $.extend(@popups, add)
-      obj = $('#' + @popups.tb_label_popup.id)
+      obj = $('#' + @popups['tb-label-menu'].id)
       if obj.length
-        @popups.tb_label_popup.obj = obj
+        @popups['tb-label-menu'].obj = obj
       else
-        delete @popups.tb_label_popup
+        delete @popups['tb-label-menu']
       return
 
   if window.rcube_mail_ui
@@ -102,7 +103,7 @@ $ ->
       # larry skin doesn't have that variable, popup works automagically, return true
       if typeof @popups == 'undefined'
         return true
-      if @popups.tb_label_popup
+      if @popups['tb-label-menu']
         true
       else
         false

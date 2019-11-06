@@ -1,44 +1,17 @@
-# global variable for contextmenu actions
-require ('../node_modules/roundcube')(rcmail)
-
-rcmail_tb_label_menu = (p) ->
-  if typeof rcmail_ui == 'undefined'
-    window.rcmail_ui = UI
-  if !rcmail_ui.check_tb_popup()
-    rcmail_ui.tb_label_popup_add()
-  # Show the popup menu with tags
-  # -- skin larry vs classic
-  if typeof rcmail_ui.show_popupmenu == 'undefined'
-    rcmail_ui.show_popup 'tb_label_popup'
-  else
-    rcmail_ui.show_popupmenu 'tb_label_popup'
-  false
-
 # Shows the submenu of thunderbird labels
-rcm_tb_label_submenu = (p) ->
+rcm_tb_label_submenu = (p, obj, ev) ->
   if typeof rcmail_ui == 'undefined'
     window.rcmail_ui = UI
-  # setup onclick and active/non active classes
-  rcm_tb_label_create_popupmenu()
+  # elastic skin of 1.4beta does not have show_popup
+  if !rcmail_ui.show_popup
+    return
   # -- create sensible popup, using roundcubes internals
   if !rcmail_ui.check_tb_popup()
     rcmail_ui.tb_label_popup_add()
   # -- skin larry vs classic
   if typeof rcmail_ui.show_popupmenu == 'undefined'
-    rcmail_ui.show_popup 'tb_label_popup'
+    return  # behaves weird, disabled
+    #rcmail_ui.show_popup 'tb-label-menu', ev  # larry
   else
-    rcmail_ui.show_popupmenu 'tb_label_popup'
+    rcmail_ui.show_popupmenu 'tb-label-menu', ev  # classic
   false
-
-rcm_tb_label_create_popupmenu = ->
-  i = 0
-  while i < 6
-    cur_a = $('li.label' + i + ' a')
-    # add/remove active class
-    selection = rcm_tb_label_get_selection()
-    if selection.length == 0
-      cur_a.removeClass 'active'
-    else
-      cur_a.addClass 'active'
-    i++
-  return

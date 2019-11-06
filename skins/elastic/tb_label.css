@@ -1,0 +1,68 @@
+.toolbarmenu li.label0,
+.toolbarmenu li.label0 a.active
+{
+  color: #EEE;
+}
+
+.toolbarmenu li .label1
+{
+  color: #FF0000 !important;
+}
+
+.toolbarmenu li .label2
+{
+  color: #FF9900 !important;
+}
+
+.toolbarmenu li .label3
+{
+  color: #009900 !important;
+}
+
+.toolbarmenu li .label4
+{
+  color: #3333FF !important;
+}
+
+.toolbarmenu li .label5
+{
+  color: #993399 !important;
+}
+
+span.tb_label_dots {
+  height: 10px;
+  margin-left: 18px;
+  line-height: 0px !important;
+}
+
+span.tb_label_dots span {
+  font-size: 32px;
+  vertical-align: top;
+  line-height: 0px !important;
+}
+
+
+/* this goes into preview of an email */
+div#labelbox {
+  white-space: nowrap;
+  position: absolute;
+  right: 67px;
+  top: 40px;
+}
+
+div#labelbox span {
+    margin: 0 3px;
+    padding: 3px;
+    border: 1px solid black;
+    border-radius: 3px;
+    color: black;
+    font-weight: bold;
+}
+
+#sections-table tbody #rcmrowthunderbird_labels td.section:before {
+	content: "\f507";  /* user-tag */
+}
+
+.toolbar a.button.tb-label:before {
+	content: "\f507";  /* user-tag */
+}

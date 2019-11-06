@@ -52,7 +52,7 @@ class rcm_tb_label_css
         color: #FFFFFF;
         background-color: {1};
       }
-      """.format escaped_label_name, colors.fg
+      """.format escaped_label_name, colors.bg
 
       css += """
       div#labelbox span.box_{0}

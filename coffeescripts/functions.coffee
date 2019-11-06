@@ -15,12 +15,12 @@ rcm_tb_label_insert = (uid, row) ->
         a - b
       if rcmail.env.tb_label_style == 'bullets'
         # bullets UI style
-        for idx of message.flags.tb_labels
-          spanobj.append '<span class="tb_label_' + message.flags.tb_labels[idx] + '">&#8226;</span>'
+        for label_name in message.flags.tb_labels
+          spanobj.append '<span class="tb_label_' + label_name + '" title="' + i18n_label(label_name) + '">&#8226;</span>'
       else
         # thunderbird UI style
-        for idx of message.flags.tb_labels
-          rowobj.addClass 'tb_label_' + message.flags.tb_labels[idx]
+        for label_name in message.flags.tb_labels
+          rowobj.addClass 'tb_label_' + label_name
   return
 
 # Problem: mail-preview-pane is an iframe, so referencing global variables does
@@ -31,6 +31,7 @@ rcm_tb_label_find_main_window = ->
   login_form = $('#login-form')
   preview_frame = $('#messagecontframe')
   popup_window = $('body.extwin')
+  elastic_popup_window = $('body.action-show')
   # login form means no mainscreen current window is okay
   if login_form.length
     return window
@@ -45,7 +46,7 @@ rcm_tb_label_find_main_window = ->
   if not ms.length and not preview_frame.length
     # TODO check for $('body.iframe') might make it more reliable
     w = window.parent
-  if popup_window.length
+  if popup_window.length or elastic_popup_window.length
     # i run in a popup window (message to be shown in popup can be configured
     # by the user)
     # theoretically we should point at window.opener, but this is unreliable,
@@ -56,8 +57,13 @@ rcm_tb_label_find_main_window = ->
     w = window
   ms = w.document.getElementById('mainscreen')
   if not ms
-    console.log("mainscreen still not found")
-    return null
+    # maybe roundcube >=1.4beta elastic skin
+    ms = w.document.getElementById('messagelist-content')
+    if not ms
+      if elastic_popup_window.length
+        return w
+      console.log("mainscreen still not found")
+      return null
   return w
 
 rcm_tb_label_global = (var_name) ->
@@ -66,6 +72,12 @@ rcm_tb_label_global = (var_name) ->
 rcm_tb_label_global_set = (var_name, value) ->
   rcm_tb_label_find_main_window()[var_name] = value
 
+escape_jquery_selector = (str) ->
+  str.replace('&', '\\&')
+
+i18n_label = (label_name) ->
+  custom_str = rcmail.env.tb_label_custom_labels[label_name]
+  (if custom_str then custom_str else label_name)  # TODO: convert punycode
 
 rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
   if not flag_uids.length
@@ -87,8 +99,8 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
   if headers_table.length
     if onoff == true
       if rcmail.env.tb_label_style == 'bullets'
-        label_box.find('span.box_tb_label_' + toggle_label_no).remove() # remove existing ones before adding
-        label_box.append '<span class="box_tb_label_' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>'
+        label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove() # remove existing ones before adding
+        label_box.append '<span class="box_tb_label_' + toggle_label_no + '">' + i18n_label(toggle_label_no) + '</span>'
       else
         headers_table.removeClass 'tb_label_' + toggle_label_no # remove before adding
         headers_table.addClass 'tb_label_' + toggle_label_no
@@ -96,7 +108,7 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
       labels_for_message.push toggle_label_no
     else
       if rcmail.env.tb_label_style == 'bullets'
-        label_box.find('span.box_tb_label_' + toggle_label_no).remove()
+        label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove()
       else
         headers_table.removeClass 'tb_label_' + toggle_label_no
       pos = jQuery.inArray(toggle_label_no, labels_for_message)
@@ -122,7 +134,7 @@ rcm_tb_label_flag_toggle = (flag_uids, toggle_label_no, onoff) ->
       rowobj = $(row.obj)
       spanobj = rowobj.find('td.subject span.tb_label_dots')
       if rcmail.env.tb_label_style == 'bullets'
-        spanobj.append '<span class="tb_label_' + toggle_label_no + '">&#8226;</span>'
+        spanobj.append '<span class="tb_label_' + toggle_label_no + '" title="' + i18n_label(toggle_label_no) + '">&#8226;</span>'
       else
         rowobj.addClass 'tb_label_' + toggle_label_no
       # add to flag list
@@ -150,27 +162,18 @@ rcm_tb_label_unflag_msgs = (unflag_uids, toggle_label_no) ->
   return
 
 # helper function to get selected/active messages
-
 rcm_tb_label_get_selection = ->
   selection = if rcmail.message_list then rcmail.message_list.get_selection() else []
   if selection.length == 0 and rcmail.env.uid
     selection = [ rcmail.env.uid ]
   selection
 
-rcm_tb_label_init_onclick = ->
-  i = 0
-  while i < 6
-    # find the "HTML a tags" of tb-label submenus
-    cur_a = $('#tb_label_popup li.label' + i + ' a')
-    # TODO check if click event is defined instead of unbinding?
-    cur_a.unbind 'click'
-    cur_a.click (ev) ->
-      rcm_tb_label_onclick $(ev.target)
-    i++
-  return
+# maps signature of RC hooks
+rcm_tb_label_menuclick = (labelname, obj, ev) ->
+  rcm_tb_label_toggle(labelname)
 
-rcm_tb_label_onclick = (me) ->
-      toggle_label = me.parent().data('labelname')
+# actually toggle the label for the selected messages
+rcm_tb_label_toggle = (toggle_label) ->
       selection = rcm_tb_label_get_selection()
       if !selection.length
         return
@@ -244,7 +247,7 @@ rcmail_ctxm_label = (command, el, pos) ->
     return
   if !selection.length and rcmail.env.uid
     rcmail.message_list.select_row rcmail.env.uid
-  cur_a = $('#tb_label_popup li.label' + rcmail.tb_label_no + ' a')
+  cur_a = $('#tb-label-menu a.label' + rcmail.tb_label_no)
   if cur_a
     cur_a.click()
   return

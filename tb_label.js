@@ -5,13 +5,12 @@ Version: 1.2.0
 Author: Michael Kefeder
 https://github.com/mike-kfed/roundcube-thunderbird_labels
  */
-var rcm_tb_label_create_popupmenu, rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_init_onclick, rcm_tb_label_insert, rcm_tb_label_onclick, rcm_tb_label_submenu, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set, rcmail_tb_label_menu,
+var escape_jquery_selector, i18n_label, rcm_tb_label_css, rcm_tb_label_find_main_window, rcm_tb_label_flag_msgs, rcm_tb_label_flag_toggle, rcm_tb_label_get_selection, rcm_tb_label_global, rcm_tb_label_global_set, rcm_tb_label_insert, rcm_tb_label_menuclick, rcm_tb_label_submenu, rcm_tb_label_toggle, rcm_tb_label_unflag_msgs, rcmail_ctxm_label, rcmail_ctxm_label_set,
   slice = [].slice;
 
 
 $(function() {
   var css, labelbox_parent, labels_for_message;
-  rcm_tb_label_init_onclick();
   css = new rcm_tb_label_css;
   css.inject();
   if (rcm_tb_label_global('tb_labels_for_message') == null) {
@@ -23,7 +22,7 @@ $(function() {
       k = e.which;
       if (k > 47 && k < 58 || k > 95 && k < 106) {
         label_no = k % 48;
-        cur_a = $('#tb_label_popup li.label' + label_no + ' a');
+        cur_a = $('#tb-label-menu a.label' + label_no);
         if (cur_a) {
           cur_a.click();
         }
@@ -53,9 +52,11 @@ $(function() {
   });
   rcmail.addEventListener('init', function(evt) {
     rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_submenu', rcm_tb_label_submenu, rcmail.env.uid);
+    rcmail.register_command('plugin.thunderbird_labels.rcm_tb_label_menuclick', rcm_tb_label_menuclick, rcmail.env.uid);
     if (rcmail.message_list) {
       rcmail.message_list.addEventListener('select', function(list) {
         rcmail.enable_command('plugin.thunderbird_labels.rcm_tb_label_submenu', list.get_selection().length > 0);
+        rcmail.enable_command('plugin.thunderbird_labels.rcm_tb_label_menuclick', list.get_selection().length > 0);
       });
     }
   });
@@ -93,16 +94,16 @@ $(function() {
     rcube_mail_ui.prototype.tb_label_popup_add = function() {
       var add, obj;
       add = {
-        tb_label_popup: {
-          id: 'tb_label_popup'
+        "tb-label-menu": {
+          id: 'tb-label-menu'
         }
       };
       this.popups = $.extend(this.popups, add);
-      obj = $('#' + this.popups.tb_label_popup.id);
+      obj = $('#' + this.popups['tb-label-menu'].id);
       if (obj.length) {
-        this.popups.tb_label_popup.obj = obj;
+        this.popups['tb-label-menu'].obj = obj;
       } else {
-        delete this.popups.tb_label_popup;
+        delete this.popups['tb-label-menu'];
       }
     };
   }
@@ -111,7 +112,7 @@ $(function() {
       if (typeof this.popups === 'undefined') {
         return true;
       }
-      if (this.popups.tb_label_popup) {
+      if (this.popups['tb-label-menu']) {
         return true;
       } else {
         return false;
@@ -183,7 +184,7 @@ rcm_tb_label_css = (function() {
       escaped_label_name = 'tb_label_' + label_name;
       css += "table.{0}\n{\n  background-color: {1};\n}".format(escaped_label_name, colors.bg);
       css += "#messagelist tr.{0} td,\n#messagelist tr.{0} td a,\nspan.{0},\n.records-table tr.selected td span.{0}\n{\n  color: {1} !important;\n}\n\n.toolbarmenu li.{0},\n.toolbarmenu li.{0} a.active\n{\n  color: {2};\n}".format(escaped_label_name, colors.fg, colors.light);
-      css += "#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}".format(escaped_label_name, colors.fg);
+      css += "#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}".format(escaped_label_name, colors.bg);
       css += "div#labelbox span.box_{0}\n{\n  background-color: {1};\n}".format(escaped_label_name, colors.box);
     }
     return css;
@@ -198,7 +199,7 @@ rcm_tb_label_css = (function() {
 })();
 
 rcm_tb_label_insert = function(uid, row) {
-  var idx, message, rowobj, spanobj;
+  var i, j, label_name, len, len1, message, ref, ref1, rowobj, spanobj;
   if (typeof rcmail.env === 'undefined' || typeof rcmail.env.messages === 'undefined') {
     return;
   }
@@ -212,12 +213,16 @@ rcm_tb_label_insert = function(uid, row) {
         return a - b;
       });
       if (rcmail.env.tb_label_style === 'bullets') {
-        for (idx in message.flags.tb_labels) {
-          spanobj.append('<span class="tb_label_' + message.flags.tb_labels[idx] + '">&#8226;</span>');
+        ref = message.flags.tb_labels;
+        for (i = 0, len = ref.length; i < len; i++) {
+          label_name = ref[i];
+          spanobj.append('<span class="tb_label_' + label_name + '" title="' + i18n_label(label_name) + '">&#8226;</span>');
         }
       } else {
-        for (idx in message.flags.tb_labels) {
-          rowobj.addClass('tb_label_' + message.flags.tb_labels[idx]);
+        ref1 = message.flags.tb_labels;
+        for (j = 0, len1 = ref1.length; j < len1; j++) {
+          label_name = ref1[j];
+          rowobj.addClass('tb_label_' + label_name);
         }
       }
     }
@@ -225,11 +230,12 @@ rcm_tb_label_insert = function(uid, row) {
 };
 
 rcm_tb_label_find_main_window = function() {
-  var login_form, ms, popup_window, preview_frame, w;
+  var elastic_popup_window, login_form, ms, popup_window, preview_frame, w;
   ms = $('#mainscreen');
   login_form = $('#login-form');
   preview_frame = $('#messagecontframe');
   popup_window = $('body.extwin');
+  elastic_popup_window = $('body.action-show');
   if (login_form.length) {
     return window;
   }
@@ -240,13 +246,19 @@ rcm_tb_label_find_main_window = function() {
   if (!ms.length && !preview_frame.length) {
     w = window.parent;
   }
-  if (popup_window.length) {
+  if (popup_window.length || elastic_popup_window.length) {
     w = window;
   }
   ms = w.document.getElementById('mainscreen');
   if (!ms) {
-    console.log("mainscreen still not found");
-    return null;
+    ms = w.document.getElementById('messagelist-content');
+    if (!ms) {
+      if (elastic_popup_window.length) {
+        return w;
+      }
+      console.log("mainscreen still not found");
+      return null;
+    }
   }
   return w;
 };
@@ -257,6 +269,20 @@ rcm_tb_label_global = function(var_name) {
 
 rcm_tb_label_global_set = function(var_name, value) {
   return rcm_tb_label_find_main_window()[var_name] = value;
+};
+
+escape_jquery_selector = function(str) {
+  return str.replace('&', '\\&');
+};
+
+i18n_label = function(label_name) {
+  var custom_str;
+  custom_str = rcmail.env.tb_label_custom_labels[label_name];
+  if (custom_str) {
+    return custom_str;
+  } else {
+    return label_name;
+  }
 };
 
 rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
@@ -279,8 +305,8 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
   if (headers_table.length) {
     if (onoff === true) {
       if (rcmail.env.tb_label_style === 'bullets') {
-        label_box.find('span.box_tb_label_' + toggle_label_no).remove();
-        label_box.append('<span class="box_tb_label_' + toggle_label_no + '">' + rcmail.env.tb_label_custom_labels[toggle_label_no] + '</span>');
+        label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove();
+        label_box.append('<span class="box_tb_label_' + toggle_label_no + '">' + i18n_label(toggle_label_no) + '</span>');
       } else {
         headers_table.removeClass('tb_label_' + toggle_label_no);
         headers_table.addClass('tb_label_' + toggle_label_no);
@@ -288,7 +314,7 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
       labels_for_message.push(toggle_label_no);
     } else {
       if (rcmail.env.tb_label_style === 'bullets') {
-        label_box.find('span.box_tb_label_' + toggle_label_no).remove();
+        label_box.find('span.box_tb_label_' + escape_jquery_selector(toggle_label_no)).remove();
       } else {
         headers_table.removeClass('tb_label_' + toggle_label_no);
       }
@@ -316,7 +342,7 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
       rowobj = $(row.obj);
       spanobj = rowobj.find('td.subject span.tb_label_dots');
       if (rcmail.env.tb_label_style === 'bullets') {
-        spanobj.append('<span class="tb_label_' + toggle_label_no + '">&#8226;</span>');
+        spanobj.append('<span class="tb_label_' + toggle_label_no + '" title="' + i18n_label(toggle_label_no) + '">&#8226;</span>');
       } else {
         rowobj.addClass('tb_label_' + toggle_label_no);
       }
@@ -353,22 +379,12 @@ rcm_tb_label_get_selection = function() {
   return selection;
 };
 
-rcm_tb_label_init_onclick = function() {
-  var cur_a, i;
-  i = 0;
-  while (i < 6) {
-    cur_a = $('#tb_label_popup li.label' + i + ' a');
-    cur_a.unbind('click');
-    cur_a.click(function(ev) {
-      return rcm_tb_label_onclick($(ev.target));
-    });
-    i++;
-  }
+rcm_tb_label_menuclick = function(labelname, obj, ev) {
+  return rcm_tb_label_toggle(labelname);
 };
 
-rcm_tb_label_onclick = function(me) {
-  var selection, toggle_label, toggle_labels, unset_all;
-  toggle_label = me.parent().data('labelname');
+rcm_tb_label_toggle = function(toggle_label) {
+  var selection, toggle_labels, unset_all;
   selection = rcm_tb_label_get_selection();
   if (!selection.length) {
     return;
@@ -447,7 +463,7 @@ rcmail_ctxm_label = function(command, el, pos) {
   if (!selection.length && rcmail.env.uid) {
     rcmail.message_list.select_row(rcmail.env.uid);
   }
-  cur_a = $('#tb_label_popup li.label' + rcmail.tb_label_no + ' a');
+  cur_a = $('#tb-label-menu a.label' + rcmail.tb_label_no);
   if (cur_a) {
     cur_a.click();
   }
@@ -457,49 +473,20 @@ rcmail_ctxm_label_set = function(which) {
   rcmail.tb_label_no = which;
 };
 
-
-rcmail_tb_label_menu = function(p) {
+rcm_tb_label_submenu = function(p, obj, ev) {
   if (typeof rcmail_ui === 'undefined') {
     window.rcmail_ui = UI;
+  }
+  if (!rcmail_ui.show_popup) {
+    return;
   }
   if (!rcmail_ui.check_tb_popup()) {
     rcmail_ui.tb_label_popup_add();
   }
   if (typeof rcmail_ui.show_popupmenu === 'undefined') {
-    rcmail_ui.show_popup('tb_label_popup');
+    return;
   } else {
-    rcmail_ui.show_popupmenu('tb_label_popup');
+    rcmail_ui.show_popupmenu('tb-label-menu', ev);
   }
   return false;
-};
-
-rcm_tb_label_submenu = function(p) {
-  if (typeof rcmail_ui === 'undefined') {
-    window.rcmail_ui = UI;
-  }
-  rcm_tb_label_create_popupmenu();
-  if (!rcmail_ui.check_tb_popup()) {
-    rcmail_ui.tb_label_popup_add();
-  }
-  if (typeof rcmail_ui.show_popupmenu === 'undefined') {
-    rcmail_ui.show_popup('tb_label_popup');
-  } else {
-    rcmail_ui.show_popupmenu('tb_label_popup');
-  }
-  return false;
-};
-
-rcm_tb_label_create_popupmenu = function() {
-  var cur_a, i, selection;
-  i = 0;
-  while (i < 6) {
-    cur_a = $('li.label' + i + ' a');
-    selection = rcm_tb_label_get_selection();
-    if (selection.length === 0) {
-      cur_a.removeClass('active');
-    } else {
-      cur_a.addClass('active');
-    }
-    i++;
-  }
 };

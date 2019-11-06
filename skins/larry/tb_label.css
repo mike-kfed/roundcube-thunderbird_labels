@@ -1,28 +1,14 @@
-#tb_label_popuplink {
+.toolbar a.button.tb-label {
   background-image: url(thunderbird_32.png);
-  /*background-repeat: repeat;*/
   background-position: 50% 0px;
-  width: 32px;
-  height: 13px;
-  padding: 28px 2px 0px 2px;
-  margin: 0px 5px 0px 5px;
 }
-
-#tb_label_popup
-{
-  width: auto;
-  position: absolute;
+/* useful? tries to show it's different from other options
+ul.toolbarmenu li a.label0.active {
+  color: #BBB;
 }
-
-#tb_label_popup a.active
-{
-  color: inherit; /* fix for firefox */
-}
-
-.toolbarmenu li.label0,
-.toolbarmenu li.label0 a.active
-{
-  color: #EEE;
+*/
+#tb-label-menu ul li {
+  background-color: #444;  /* hack, else submenu has light blue background? */
 }
 
 span.tb_label_dots {
@@ -33,7 +19,7 @@ span.tb_label_dots {
   height: 0px;
 }
 
-/* hack for firefox : doesnt display the bullets at the correct height */
+/* hack for firefox : doesn't display the bullets at the correct height */
 @-moz-document url-prefix() {
   span.tb_label_dots {
     top: -19px;

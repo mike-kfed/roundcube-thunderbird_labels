@@ -6,7 +6,7 @@
 * Label of a message can be changed/set exactly like in Thunderbird
 * Keyboard shortcuts on keys 0-5 work like in Thunderbird
 * Integrates into contextmenu plugin when available
-* Works for skins classic and larry
+* Works for skins *classic*, *larry* and *elastic*
 * currently available translations:
   * English
   * French (Français)
@@ -25,6 +25,7 @@
   * Brazilian Portuguese (português do Brasil)
   * Portuguese (português)
   * Dutch (Nederlands)
+  * Greek (ελληνικά)
 * [screenshot](http://mike-kfed.github.io/roundcube-thunderbird_labels/)
 
 ### INSTALL

@@ -1,3 +1,4 @@
+# TODO: no longer necessary for skin elastic, remove this file
 # thunderbird_labels integration for contextmenu plugin (with help from Philip Weir)
 rcmail.addEventListener 'contextmenu_init', (menu) ->
   # dentify the folder list context menu

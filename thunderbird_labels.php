@@ -57,20 +57,10 @@ class thunderbird_labels extends rcube_plugin
 			);
 			$this->message_tb_labels = array();
 
-			$this->add_button(
-				array(
-					'command' => 'plugin.thunderbird_labels.rcm_tb_label_submenu',
-					'id' => 'tb_label_popuplink',
-					'title' => 'tb_label_button_title',
-					'domain' => $this->ID,
-					'type' => 'link',
-					'content' => $this->gettext('tb_label_button_label'),
-					'class' => 'button buttonPas disabled',
-					'classact' => 'button',
-					),
-				'toolbar'
-			);
 
+			$html = $this->template_file2html('toolbar');
+			if ($html)
+				$this->api->add_content($html, 'toolbar');
 			// JS function "set_flags" => PHP function "set_flags"
 			$this->register_action('plugin.thunderbird_labels.set_flags', array($this, 'set_flags'));
 
@@ -180,22 +170,22 @@ class thunderbird_labels extends rcube_plugin
 			);
 		}
 
-		$key = 'tb_label_custom_labels';
-		if (!in_array($key, $dont_override)
+		if (!in_array('tb_label_custom_labels', $dont_override)
 			&& $this->rc->config->get('tb_label_modify_labels'))
 		{
-			$old = $this->rc->config->get($key);
-			for($i=1; $i<=5; $i++)
+			$custom_labels = $this->rc->config->get('tb_label_custom_labels');
+			foreach ($custom_labels as $key => $value)
 			{
 				$input = new html_inputfield(array(
-					'name' => $key.$i,
-					'id' => $key.$i,
+					'name' => "custom_$key",
+					'id' => "custom_$key",
 					'type' => 'text',
 					'autocomplete' => 'off',
-					'value' => $old[$i]));
+					'title' => $this->getText(strtolower($key)), # shows default value on hover
+					'value' => $value));
 
-				$args['blocks']['tb_label']['options'][$key.$i] = array(
-					'title' => $this->gettext('tb_label_label')." ".$i,
+				$args['blocks']['tb_label']['options']["option_$key"] = array(
+					'title' => $key,
 					'content' => $input->show()
 					);
 			}
@@ -209,7 +199,6 @@ class thunderbird_labels extends rcube_plugin
 	{
 		if ($args['section'] != 'thunderbird_labels')
 		  return $args;
-
 
 		$this->load_config();
 		$dont_override = (array) $this->rc->config->get('dont_override', array());
@@ -227,12 +216,12 @@ class thunderbird_labels extends rcube_plugin
 			&& $this->rc->config->get('tb_label_modify_labels'))
 		{
 			$args['prefs']['tb_label_custom_labels'] = array(
-			0 => $this->gettext('label0'),
-			1 => rcube_utils::get_input_value('tb_label_custom_labels1', rcube_utils::INPUT_POST),
-			2 => rcube_utils::get_input_value('tb_label_custom_labels2', rcube_utils::INPUT_POST),
-			3 => rcube_utils::get_input_value('tb_label_custom_labels3', rcube_utils::INPUT_POST),
-			4 => rcube_utils::get_input_value('tb_label_custom_labels4', rcube_utils::INPUT_POST),
-			5 => rcube_utils::get_input_value('tb_label_custom_labels5', rcube_utils::INPUT_POST)
+			'LABEL0' => $this->gettext('label0'),
+			'LABEL1' => rcube_utils::get_input_value('custom_LABEL1', rcube_utils::INPUT_POST),
+			'LABEL2' => rcube_utils::get_input_value('custom_LABEL2', rcube_utils::INPUT_POST),
+			'LABEL3' => rcube_utils::get_input_value('custom_LABEL3', rcube_utils::INPUT_POST),
+			'LABEL4' => rcube_utils::get_input_value('custom_LABEL4', rcube_utils::INPUT_POST),
+			'LABEL5' => rcube_utils::get_input_value('custom_LABEL5', rcube_utils::INPUT_POST)
 			);
 		}
 
@@ -241,29 +230,9 @@ class thunderbird_labels extends rcube_plugin
 
 	public function show_tb_label_contextmenu($args)
 	{
-		$this->include_script('tb_label_contextmenu.js');
-		#$this->api->output->add_label('copymessage.copyingmessage');
-
-		// deactivated, no clue how to do submenus in contextmenuplugin
-		/*
-		$li = html::tag('li',
-			array('role' => 'menuitem', 'class' => 'submenu'),
-			$this->api->output->button(array(
-				'label' => rcube::Q($this->gettext('tb_label_contextmenu_title')),
-				'content' => '<span class="icon">'.rcube::Q($this->gettext('tb_label_contextmenu_title')).'</span>',
-				#'content' => '<span class="icon">[Labels]</span><span class="right-arrow"></span>',
-				'command' => "some.test.comma.nd",
-				'onclick' => "UI.toggle_popup('tb_label_popup', event); return false",
-				'type' => 'link',
-				'class' => 'icon more',
-				'tabindex' => '-1',
-				'aria-disabled' => 'true'
-			)));
-		*/
-		//. $this->_gen_label_submenu($args, 'tb_label_ctxm_submenu'));
-		$out = html::tag('ul', array('id' => 'tb_label_ctxm_mainmenu', 'role' => "menu"), $li);
-		$out = $this->_gen_label_submenu($args, 'tb_label_ctxm_mainmenu'); # FIXME directly appended to context menu, makes it super long = bad
-		$this->api->output->add_footer(html::div(array('style' => 'display: none;', 'aria-hidden' => 'true'), $out));
+		# no longer needed
+		#$this->include_script('tb_label_contextmenu.js');
+		return null;
 	}
 
 	private function _gen_label_submenu($args, $id)
@@ -364,32 +333,84 @@ class thunderbird_labels extends rcube_plugin
 			|| !is_array($flag_uids))
 			return false;
 
-
-		# prepend $ again to be compatible to Thunderbird (roundcube removes $ from labels)
-		$imap->set_flag($flag_uids, "UN$toggle_label", $mbox); # quickhack to remove non-$ labels
-		$imap->set_flag($flag_uids, "\$$toggle_label", $mbox);
-		$imap->set_flag($unflag_uids, "UN$toggle_label", $mbox); # quickhack to remove non-$ labels
-		$imap->set_flag($unflag_uids, "UN\$$toggle_label", $mbox);
+		# FIXME: there is no reliable way to know if roundcube mangled a label of different client
+		#        here is just a workaround for the known Thunderbird labels
+		if (preg_match("/^LABEL[1-5]$/", $toggle_label)) # only for Thunderbird labels
+		{
+			$imap->set_flag($flag_uids, "UN$toggle_label", $mbox); # quickhack to remove non-$ labels
+			$imap->set_flag($unflag_uids, "UN$toggle_label", $mbox); # quickhack to remove non-$ labels
+			# prepend $ again to be compatible to Thunderbird (roundcube removes $ from labels)
+			$imap->set_flag($flag_uids, "\$$toggle_label", $mbox);
+			$imap->set_flag($unflag_uids, "UN\$$toggle_label", $mbox);
+		}
+		else
+		{
+			$imap->set_flag($flag_uids, "$toggle_label", $mbox);
+			$imap->set_flag($unflag_uids, "UN$toggle_label", $mbox);
+		}
 
 		$this->api->output->send();
 	}
 
-	function tb_label_popup()
+	function template_include_markup($tpl_name)
 	{
+		$path = '/' . $this->local_skin_path() . '/includes/' . $tpl_name . '.html';
+		$filepath = slashify($this->home) . $path;
+		if (is_file($filepath) && is_readable($filepath))
+			return "<roundcube:include file=\"$path\" skinpath=\"plugins/thunderbird_labels\" />";
+		return null;
+	}
+
+	function template_file2html($tpl_name)
+	{
+		$tpl_cmd = $this->template_include_markup($tpl_name);
+		if ($tpl_cmd)
+			return $this->template2html($tpl_cmd);
+		return null;
+	}
+
+	function template2html($tpl_code)
+	{
+		if ($this->api->output->type == 'html')
+		{
+			if ($tpl_code)
+			{
+				$this->add_texts('localization/');
+				return $this->rc->output->just_parse($tpl_code);
+			}
+		}
+		return null;
+	}
+
+	function tb_label_popup($args)
+	{
+		// Other plugins may use template parsing method, this causes more than one render_page execution.
+		// We have to make sure the menu is added only once (when content is going to be written to client).
+		// roundcube < 1.4 does not send 'write' key
+		if (array_key_exists('write', $args) && !$args['write'])
+			return;
+
+		$html = $this->template_file2html($this->rc->task);
+		if ($html)
+			$this->rc->output->add_footer($html);
+
+		# create a RC template for the popup-menu of tb-labels, make html from it and inject
+		$tpl = '
+	<div id="tb-label-menu" class="popupmenu">
+		<h3 id="aria-label-tb-labelmenu" class="voice"><roundcube:label name="thunderbird_labels.tb_label_button_label" /></h3>
+		<ul class="toolbarmenu listing" role="menu" aria-labelledby="aria-label-tb-labelmenu">';
+		$tpl_end = '</ul></div>';
+		$tpl_menu = '';
 		$custom_labels = $this->rc->config->get('tb_label_custom_labels');
-		$out = '<div id="tb_label_popup" class="popupmenu">
-			<ul class="toolbarmenu">';
 		$i = 0;
 		foreach ($custom_labels as $label_name => $human_readable)
 		{
-			$separator = ($i == 0)? ' separator_below' :'';
-			$out .= '<li class="label'.$i.$separator.'" data-labelname="LABEL'.$i.'"><a href="#" class="active">'.$i.' '.$human_readable.'</a></li>';
+			$tpl_menu .= '<roundcube:button type="link-menuitem" command="plugin.thunderbird_labels.rcm_tb_label_menuclick" content="'."$i $human_readable".'" prop="LABEL'.$i.'" classAct="tb-label label'.$i.' inline active" class="tb-label label'.$i.'" data-labelname="LABEL'.$i.'" />';
 			$i++;
 		}
-		$out .= '</ul>
-		</div>';
-		$this->rc->output->add_gui_object('tb_label_popup_obj', 'tb_label_popup');
-		$this->rc->output->add_footer($out);
+		$html = $this->template2html($tpl.$tpl_menu.$tpl_end);
+		if ($html)
+			$this->rc->output->add_footer($html);
 	}
 
 	/* Bastardised hook, actually supposed to modify the list of folders for refresh
@@ -409,11 +430,11 @@ class thunderbird_labels extends rcube_plugin
 			if (empty($_SESSION['list_mod_seq']) || $_SESSION['list_mod_seq'] != $data['HIGHESTMODSEQ']) {
 			   $flags = $RCMAIL->storage->list_flags($mbox_name, explode(',', $uids), $_SESSION['list_mod_seq']);
 			   foreach ($flags as $idx => $row) {
-			       $flags[$idx] = array_change_key_case(array_map('intval', $row));
+				   $flags[$idx] = array_change_key_case(array_map('intval', $row));
 			   }
 			   // remember last HIGHESTMODSEQ value (if supported)
 			   if (!empty($data['HIGHESTMODSEQ'])) {
-			       $_SESSION['list_mod_seq'] = $data['HIGHESTMODSEQ'];
+				   $_SESSION['list_mod_seq'] = $data['HIGHESTMODSEQ'];
 			   }
 
 			   $RCMAIL->output->set_env('recent_flags', $flags);
