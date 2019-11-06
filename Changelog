@@ -1,9 +1,10 @@
-v1.4beta
+v1.4rc2
 ---
 - completely refactored building and injecting the needed popup-menu
-- compatible to roundcube v1.4beta "elastic" skin
+- compatible to roundcube v1.4rc2 "elastic" skin
 - styling updates to look more like native roundcube
 - take advantage of default behaviour with plugin contextmenu 3.0
+- greek translation by rinenweb
 
 v1.3.1
 ---
