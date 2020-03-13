@@ -1,3 +1,7 @@
+v1.4.2
+---
+- interim release trying to get composer to work with the plugin
+
 v1.4rc2
 ---
 - completely refactored building and injecting the needed popup-menu
