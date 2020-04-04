@@ -30,14 +30,12 @@
 }
 
 span.tb_label_dots {
-  height: 10px;
   margin-left: 18px;
   line-height: 0px !important;
 }
 
 span.tb_label_dots span {
   font-size: 32px;
-  vertical-align: top;
   line-height: 0px !important;
 }
 
