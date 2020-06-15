@@ -5,7 +5,6 @@
     "keywords": ["mail","labels","tags"],
     "license": "BSD-2-Clause",
     "homepage": "https://github.com/mike-kfed/roundcube-thunderbird_labels",
-    "version": "1.4.2",
     "authors": [
         {
             "name": "Michael Kefeder",
