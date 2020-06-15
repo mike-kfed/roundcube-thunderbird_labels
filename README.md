@@ -26,6 +26,7 @@
   * Portuguese (português)
   * Dutch (Nederlands)
   * Greek (ελληνικά)
+  * Japanese (日本語)
 * [screenshot](http://mike-kfed.github.io/roundcube-thunderbird_labels/)
 
 ### INSTALL
