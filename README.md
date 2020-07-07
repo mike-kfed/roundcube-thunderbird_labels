@@ -35,7 +35,7 @@
 
 1. unpack to plugins directory
 1. add `, 'thunderbird_labels'` to `$rcmail_config['plugins']` in roundcubes `config/config.inc.php`
-1. rename `config.inc.php-dist` to `config.inc.php`
+1. rename `config.inc.php.dist` to `config.inc.php`
 1. if you run a custom skin, e.g. `silver` then you should also symlink or copy the skins folder
    of the plugin to the corresponding skins name, for the example given:
    `ln -s plugins/thunderbird_labels/skins/larry plugins/thunderbird_labels/skins/silver`
