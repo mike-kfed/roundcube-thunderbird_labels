@@ -1,3 +1,7 @@
+v1.4.7
+---
+- using config.inc.php.dist to avoid overwriting by composer (Issue 57)
+
 v1.4.6
 ---
 - added Japanase translation by radi-sh
