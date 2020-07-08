@@ -1,4 +1,4 @@
-v1.4.7
+v1.4.8
 ---
 - using config.inc.php.dist to avoid overwriting by composer (Issue 57)
 
