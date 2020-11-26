@@ -1,5 +1,5 @@
 ###
-Version: 1.2.0
+Version: 1.4.0
 Author: Michael Kefeder
 https://github.com/mike-kfed/roundcube-thunderbird_labels
 ###
@@ -16,7 +16,16 @@ $ ->
   # add keyboard shortcuts for keyboard and keypad if pref tb_label_enable_shortcuts=true
   if rcmail.env.tb_label_enable_shortcuts
     $(document).keyup (e) ->
+      # ignore IME composition
+      if e.isComposing || e.keyCode == 229
+        return
       #console.log('Handler for .keyup() called.' + e.which);
+      # ignore modifier keys when pressed with blah
+      if e.shiftKey || e.altKey || e.ctrlKey || e.metaKey
+        return
+      # quichack issue #60 ignore when typing in search input
+      if e.target.nodeName == 'INPUT'
+        return
       k = e.which
       if k > 47 and k < 58 or k > 95 and k < 106
         label_no = k % 48

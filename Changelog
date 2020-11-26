@@ -1,3 +1,8 @@
+v1.4.9
+---
+- ignore keyup when pressed with modifiers, do not apply when typing
+  into an input field (Issue 60)
+
 v1.4.8
 ---
 - using config.inc.php.dist to avoid overwriting by composer (Issue 57)
