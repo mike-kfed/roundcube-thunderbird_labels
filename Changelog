@@ -1,3 +1,7 @@
+v1.4.10
+---
+- icons and colors in contextmenu (PR 61 by gianlucagiacometti)
+
 v1.4.9
 ---
 - ignore keyup when pressed with modifiers, do not apply when typing
