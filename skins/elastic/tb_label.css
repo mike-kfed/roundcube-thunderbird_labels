@@ -64,3 +64,38 @@ div#labelbox span {
 .toolbar a.button.tb-label:before {
 	content: "\f507";  /* user-tag */
 }
+
+div.contextmenu a.rcm-uidropdown::before {
+  content: "\f507";  /* user-tag */
+}
+
+div.contextmenu li.label0,
+div.contextmenu li.label0 a.active
+{
+  color: #EEE;
+}
+
+div.contextmenu li .label1
+{
+  color: #FF0000 !important;
+}
+
+div.contextmenu li .label2
+{
+  color: #FF9900 !important;
+}
+
+div.contextmenu li .label3
+{
+  color: #009900 !important;
+}
+
+div.contextmenu li .label4
+{
+  color: #3333FF !important;
+}
+
+div.contextmenu li .label5
+{
+  color: #993399 !important;
+}
