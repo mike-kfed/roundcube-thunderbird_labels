@@ -127,3 +127,6 @@ span.tb_label_dots span.tb_label_badges {
 .tb_label_badges.label5 {
 	background-color: #993399 !important;
 }
+#message-header{
+	position: relative;	
+}
