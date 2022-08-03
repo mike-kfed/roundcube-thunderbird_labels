@@ -375,7 +375,7 @@ rcm_tb_label_flag_toggle = function(flag_uids, toggle_label_no, onoff) {
       if (rcmail.env.tb_label_style === 'bullets') {
         rowobj.find('td.subject span.tb_label_dots span.tb_label_' + toggle_label_no).remove();
       } else if (rcmail.env.tb_label_style === 'badges') {
-		rowobj.removeClass('tb_label_badges');
+		rowobj.find('td.subject span.tb_label_dots span.tb_label_badges.' + toggle_label_no.toLowerCase()).remove();
       } else {
         rowobj.removeClass('tb_label_' + toggle_label_no);
       }
