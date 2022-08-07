@@ -1,3 +1,13 @@
+v1.4.12
+---
+- new feature "Badges" showing label text in message list (PR 65 by Mariusz
+  Krzaczkowski)
+- removed coffeescript source
+
+v1.4.11
+---
+- don't use `$rcmail_config` (Issue 64)
+
 v1.4.10
 ---
 - icons and colors in contextmenu (PR 61 by gianlucagiacometti)
