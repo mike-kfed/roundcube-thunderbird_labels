@@ -99,7 +99,7 @@ div#labelbox {
   white-space: nowrap;
   position: absolute;
   right: 5%;
-  top: 0px;
+  top: 10px;
 }
 
 
@@ -160,3 +160,50 @@ div#labelbox span.tb_label_span5 {
   color: #FFFFFF;
 }
 */
+.badge {
+    display: inline-block;
+    padding: 0.25em 0.4em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+span.tb_label_dots {
+	margin: 3px 1.1em 1.5em 1.4em;
+	clear: both;
+	display: block;
+}
+
+span.tb_label_dots span.tb_label_badges {
+	font-size: 11px;
+	line-height: 11px !important;
+	color: #fff;
+	margin-right: 8px;
+	margin-bottom: 3px;
+	margin-top: -2px;
+	background-color: #c9c9c9;
+}
+.tb_label_badges.label1 {
+	background-color: #ff0000 !important;
+}
+
+.tb_label_badges.label2 {
+	background-color: #ff9900 !important;
+}
+
+.tb_label_badges.label3 {
+	background-color: #009900 !important;
+}
+
+.tb_label_badges.label4 {
+	background-color: #3333ff !important;
+}
+
+.tb_label_badges.label5 {
+	background-color: #993399 !important;
+}

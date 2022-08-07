@@ -44,8 +44,8 @@ span.tb_label_dots span {
 div#labelbox {
   white-space: nowrap;
   position: absolute;
-  right: 67px;
-  top: 40px;
+  right: 5px;
+  top: 10px;
 }
 
 div#labelbox span {
@@ -98,4 +98,35 @@ div.contextmenu li .label4
 div.contextmenu li .label5
 {
   color: #993399 !important;
+}
+span.tb_label_dots span.tb_label_badges {
+	font-size: 11px;
+	line-height: 11px !important;
+	color: #fff;
+	margin-right: 8px;
+	margin-bottom: 3px;
+	margin-top: -2px;
+	background-color: #c9c9c9;
+}
+.tb_label_badges.label1 {
+	background-color: #ff0000 !important;
+}
+
+.tb_label_badges.label2 {
+	background-color: #ff9900 !important;
+}
+
+.tb_label_badges.label3 {
+	background-color: #009900 !important;
+}
+
+.tb_label_badges.label4 {
+	background-color: #3333ff !important;
+}
+
+.tb_label_badges.label5 {
+	background-color: #993399 !important;
+}
+#message-header{
+	position: relative;	
 }
