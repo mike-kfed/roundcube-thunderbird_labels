@@ -405,7 +405,7 @@ class thunderbird_labels extends rcube_plugin
 		$i = 0;
 		foreach ($custom_labels as $label_name => $human_readable)
 		{
-			$tpl_menu .= '<roundcube:button type="link-menuitem" command="plugin.thunderbird_labels.rcm_tb_label_menuclick" content="'."$i $human_readable".'" prop="LABEL'.$i.'" classAct="tb-label label'.$i.' inline active" class="tb-label label'.$i.'" data-labelname="LABEL'.$i.'" />';
+			$tpl_menu .= '<roundcube:button type="link-menuitem" command="plugin.thunderbird_labels.rcm_tb_label_menuclick" content="'.rcube::Q("$i $human_readable").'" prop="LABEL'.$i.'" classAct="tb-label label'.$i.' inline active" class="tb-label label'.$i.'" data-labelname="LABEL'.$i.'" />';
 			$i++;
 		}
 		$html = $this->template2html($tpl.$tpl_menu.$tpl_end);
