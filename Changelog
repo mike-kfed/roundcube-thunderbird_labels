@@ -1,3 +1,7 @@
+v1.4.13
+---
+- [Security Advisory](https://github.com/mike-kfed/roundcube-thunderbird_labels/security/advisories/GHSA-wp6h-wgxq-v949) identified and fixed by Bartosz Kwitniewski
+
 v1.4.12
 ---
 - new feature "Badges" showing label text in message list (PR 65 by Mariusz
