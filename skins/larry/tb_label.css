@@ -28,8 +28,11 @@ span.tb_label_dots {
 
 span.tb_label_dots span {
   font-size: 32px;
-  vertical-align: middle;
   line-height: 0px;
+}
+
+span.tb_label_dots.bullets span {
+  vertical-align: -0.23em;
 }
 
 
@@ -70,10 +73,17 @@ div#labelbox span {
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
+.widescreen .messagelist td.subject span.subject {
+	display: unset;
+}
+
 span.tb_label_dots {
 	margin: 3px 1.1em 1.5em 1.4em;
 	clear: both;
-	display: block;
+}
+
+span.tb_label_dots.badges {
+	vertical-align: middle;
 }
 
 span.tb_label_dots span.tb_label_badges {
@@ -81,7 +91,6 @@ span.tb_label_dots span.tb_label_badges {
 	line-height: 11px !important;
 	color: #fff;
 	margin-right: 8px;
-	margin-bottom: 3px;
 	margin-top: -2px;
 	background-color: #c9c9c9;
 }
