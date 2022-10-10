@@ -14,6 +14,7 @@ class thunderbird_labels extends rcube_plugin
 	private $rc;
 	private $map;
 	private $_custom_flags_allowed = null;
+	const LABEL_STYLES = ['thunderbird', 'bullets', 'badges'];
 
 	function init()
 	{
@@ -161,7 +162,7 @@ class thunderbird_labels extends rcube_plugin
 				'name' => $key,
 				'id' => $key
 			));
-			$select->add([$this->gettext('thunderbird'), $this->gettext('bullets'), $this->gettext('badges')], ['thunderbird', 'bullets', 'badges']);
+			$select->add([$this->gettext('thunderbird'), $this->gettext('bullets'), $this->gettext('badges')], self::LABEL_STYLES);
 			$content = $select->show($this->rc->config->get($key));
 
 			$args['blocks']['tb_label']['options'][$key] = array(
@@ -210,7 +211,13 @@ class thunderbird_labels extends rcube_plugin
 		  $args['prefs']['tb_label_enable_shortcuts'] = rcube_utils::get_input_value('tb_label_enable_shortcuts', rcube_utils::INPUT_POST) ? true : false;
 
 		if (!in_array('tb_label_style', $dont_override))
-			$args['prefs']['tb_label_style'] = rcube_utils::get_input_value('tb_label_style', rcube_utils::INPUT_POST);
+		{
+			$tb_label_style = rcube_utils::get_input_value('tb_label_style', rcube_utils::INPUT_POST);
+			if (in_array($tb_label_style, self::LABEL_STYLES))
+			{
+				$args['prefs']['tb_label_style'] = $tb_label_style;
+			}
+		}
 
 		if (!in_array('tb_label_custom_labels', $dont_override)
 			&& $this->rc->config->get('tb_label_modify_labels'))
