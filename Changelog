@@ -1,3 +1,7 @@
+v1.4.14
+---
+- Fix label position on skin larry (PR 68 by Alexander Moisseev)
+
 v1.4.13
 ---
 - [Security Advisory](https://github.com/mike-kfed/roundcube-thunderbird_labels/security/advisories/GHSA-wp6h-wgxq-v949) identified and fixed by Bartosz Kwitniewski
