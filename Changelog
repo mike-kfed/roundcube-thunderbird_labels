@@ -1,6 +1,7 @@
 v1.4.13
 ---
 - [Security Advisory](https://github.com/mike-kfed/roundcube-thunderbird_labels/security/advisories/GHSA-wp6h-wgxq-v949) identified and fixed by Bartosz Kwitniewski
+- limit label-style config options (PR 67 by Zerg2000)
 
 v1.4.12
 ---
