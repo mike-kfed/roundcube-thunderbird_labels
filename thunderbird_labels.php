@@ -322,7 +322,7 @@ class thunderbird_labels extends rcube_plugin
 	{
 		#rcube::write_log($this->name, print_r($_GET, true));
 
-		$imap = $this->rc->imap;
+		$imap = $this->rc->storage;
 		$cbox = rcube_utils::get_input_value('_cur', rcube_utils::INPUT_GET);
 		$mbox = rcube_utils::get_input_value('_mbox', rcube_utils::INPUT_GET);
 		$toggle_label = rcube_utils::get_input_value('_toggle_label', rcube_utils::INPUT_GET);
