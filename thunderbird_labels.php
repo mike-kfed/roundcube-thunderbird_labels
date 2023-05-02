@@ -17,6 +17,7 @@ class thunderbird_labels extends rcube_plugin
 	private $message_tb_labels;
 	private $name;
 	private $add_tb_flags;
+	private $list_flags;
 	const LABEL_STYLES = ['thunderbird', 'bullets', 'badges'];
 
 	function init()
