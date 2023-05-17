@@ -173,7 +173,7 @@ div#labelbox span.tb_label_span5 {
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
 
-span.tb_label_dots {
+span.tb_label_dots.badges:not(:empty) {
 	margin: 3px 1.1em 1.5em 1.4em;
 	clear: both;
 	display: block;
