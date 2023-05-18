@@ -2,6 +2,7 @@ v1.6.2
 ---
 - added swedish translation (PR 72 by Daniel Johansson - LANTECH)
 - avoid dynamic property deprecation warnings of PHP 8.2 (PR 75 by Nik Soggia)
+- Fix issue #69 needless space use in classic skin (PR 77 by buttercookie42)
 
 v1.6.1
 ---
