@@ -438,7 +438,7 @@ class thunderbird_labels extends rcube_plugin
 			$data = $RCMAIL->storage->folder_data($mbox_name);
 
 			if (empty($_SESSION['list_mod_seq']) || $_SESSION['list_mod_seq'] != $data['HIGHESTMODSEQ']) {
-			   $flags = $RCMAIL->storage->list_flags($mbox_name, explode(',', $uids), $_SESSION['list_mod_seq']);
+			   $flags = $RCMAIL->storage->list_flags($mbox_name, explode(',', $uids), !empty($_SESSION['list_mod_seq'])? $_SESSION['list_mod_seq'] : null);
 			   foreach ($flags as $idx => $row) {
 				   $flags[$idx] = array_change_key_case(array_map('intval', $row));
 			   }
