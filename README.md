@@ -2,33 +2,34 @@
 
 ### Features
 
-* Displays the message rows using the same colors as Thunderbird does
-* Label of a message can be changed/set exactly like in Thunderbird
-* Keyboard shortcuts on keys 0-5 work like in Thunderbird
-* Integrates into contextmenu plugin when available
-* Works for skins *classic*, *larry* and *elastic* (highest priority for *elastic*)
-* currently available translations:
-  * English
-  * French (Français)
-  * German (Deutsch)
-  * Polish (Polski)
-  * Russian (Русский)
-  * Hungarian (Magyar)
-  * Czech (Česky)
-  * Bulgarian (български език)
-  * Catalan (català)
-  * Latvian (latviešu)
-  * Italian (italiano)
-  * Spanish (español)
-  * Slovak (Slovenčina)
-  * Ukranian (українська)
-  * Brazilian Portuguese (português do Brasil)
-  * Portuguese (português)
-  * Dutch (Nederlands)
-  * Greek (ελληνικά)
-  * Japanese (日本語)
-  * Swedish (svenska)
-* [screenshot](http://mike-kfed.github.io/roundcube-thunderbird_labels/)
+- Displays the message rows using the same colors as Thunderbird does
+- Label of a message can be changed/set exactly like in Thunderbird
+- Keyboard shortcuts on keys 0-5 work like in Thunderbird
+- Integrates into contextmenu plugin when available
+- Works for skins _classic_, _larry_ and _elastic_ (highest priority for _elastic_)
+- currently available translations:
+  - English
+  - French (Français)
+  - German (Deutsch)
+  - Polish (Polski)
+  - Russian (Русский)
+  - Hungarian (Magyar)
+  - Czech (Česky)
+  - Bulgarian (български език)
+  - Catalan (català)
+  - Latvian (latviešu)
+  - Italian (italiano)
+  - Spanish (español)
+  - Slovak (Slovenčina)
+  - Ukranian (українська)
+  - Brazilian Portuguese (português do Brasil)
+  - Portuguese (português)
+  - Dutch (Nederlands)
+  - Greek (ελληνικά)
+  - Japanese (日本語)
+  - Swedish (svenska)
+  - Tunisian Arabic (تونسي)
+- [screenshot](http://mike-kfed.github.io/roundcube-thunderbird_labels/)
 
 ### INSTALL
 
@@ -56,13 +57,14 @@ See `config.inc.php` for more details
 - `tb_label_style = 'bullets'`, `'thunderbird'` or `'badges'`
 
 ### Author
+
 Michael Kefeder
 <https://github.com/mike-kfed/roundcube-thunderbird_labels>
 
 ### History
+
 This plugin is based on a patch I found for roundcube 0.3 a long time ago.
 
 Since roundcube is now able to handle the labels without modification of its source I decided to create a plugin.
 
 There exists a "Tags plugin for RoundCube" <http://sourceforge.net/projects/tagspluginrc/> which does something similar, my plugin emulates thunderbirds behaviour better I think (coloring the message rows for example)
-
