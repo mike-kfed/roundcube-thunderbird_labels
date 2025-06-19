@@ -98,26 +98,110 @@ $(function () {
     rcmail.register_command(
       "plugin.thunderbird_labels.rcm_tb_label_submenu",
       rcm_tb_label_submenu,
-      rcmail.env.uid
+      true // Enable based on selection later
     );
     rcmail.register_command(
       "plugin.thunderbird_labels.rcm_tb_label_menuclick",
       rcm_tb_label_menuclick,
-      rcmail.env.uid
+      true // Enable based on selection later
     );
+    // Register command for the new filter submenu
+    rcmail.register_command(
+      "plugin.thunderbird_labels.rcm_tb_label_filter_submenu",
+      rcm_tb_label_filter_submenu_handler, // Will be defined later
+      true // Always enable for filter menu if in mail view
+    );
+
+    // Enable/disable commands based on selection (for label setting)
+    // Filter button should generally be enabled if message list exists.
     if (rcmail.message_list) {
+      // Listener for selection changes
       rcmail.message_list.addEventListener("select", function (list) {
-        rcmail.enable_command(
-          "plugin.thunderbird_labels.rcm_tb_label_submenu",
-          list.get_selection().length > 0
-        );
-        rcmail.enable_command(
-          "plugin.thunderbird_labels.rcm_tb_label_menuclick",
-          list.get_selection().length > 0
-        );
+        var selection_empty = list.get_selection().length === 0;
+        rcmail.enable_command("plugin.thunderbird_labels.rcm_tb_label_submenu", !selection_empty);
+        rcmail.enable_command("plugin.thunderbird_labels.rcm_tb_label_menuclick", !selection_empty);
       });
+      // Set initial state for commands that depend on selection
+      var initial_selection_empty = rcmail.message_list.get_selection().length === 0;
+      rcmail.enable_command("plugin.thunderbird_labels.rcm_tb_label_submenu", !initial_selection_empty);
+      rcmail.enable_command("plugin.thunderbird_labels.rcm_tb_label_menuclick", !initial_selection_empty);
+
+      // The filter button itself should be enabled if on mail view with a message list.
+      rcmail.enable_command("plugin.thunderbird_labels.rcm_tb_label_filter_submenu", rcmail.task === 'mail' && rcmail.objectname === 'messagelist');
+    } else {
+      // If there's no message list (e.g. other views), disable selection-dependent commands
+      rcmail.enable_command("plugin.thunderbird_labels.rcm_tb_label_submenu", false);
+      rcmail.enable_command("plugin.thunderbird_labels.rcm_tb_label_menuclick", false);
+      // Also disable filter button if no message list context
+      rcmail.enable_command("plugin.thunderbird_labels.rcm_tb_label_filter_submenu", false);
     }
   });
+  // Handler for showing the filter popup menu
+  window.rcm_tb_label_filter_submenu_handler = function(props, obj, event) {
+    // Use rcmail_ui if defined (covers most modern skins)
+    var ui = typeof rcmail_ui !== 'undefined' ? rcmail_ui : (typeof UI !== 'undefined' ? UI : null);
+
+    if (!ui) return false; // Should not happen in normal Roundcube environment
+
+    // Ensure popup is registered with UI, especially for older skins or dynamic addition
+    if (!ui.popups || !ui.popups['tb-label-filter-menu']) {
+        if (typeof rcube_mail_ui !== 'undefined' && typeof rcube_mail_ui.prototype.tb_label_popup_add === 'function') {
+            // This assumes tb_label_popup_add is extended to handle both popups
+            rcube_mail_ui.prototype.tb_label_popup_add.call(ui);
+        } else {
+            // Fallback for modern UI if registration is simple
+             ui.popups = ui.popups || {};
+             ui.popups['tb-label-filter-menu'] = {id: 'tb-label-filter-menu', obj: $('#tb-label-filter-menu')};
+        }
+    }
+
+    // Populate checkboxes based on current filter from rcmail.env
+    // rcmail.env variables are typically set by the server-side script (PHP)
+    var current_filter_str = rcmail.env._labels_filter || ''; // Ensure rcmail.env._labels_filter is populated by PHP
+    var active_filters = current_filter_str ? current_filter_str.split(',') : [];
+
+    $('#tb-label-filter-menu input[name="tb_label_filter_checkbox"]').each(function() {
+        $(this).prop('checked', active_filters.includes($(this).val()));
+    });
+
+    // Visual indication for the filter button
+    var filter_button = $('#tb-label-filter-button');
+    if (active_filters.length > 0) {
+        filter_button.addClass('active');
+    } else {
+        filter_button.removeClass('active');
+    }
+
+    ui.show_popupmenu('tb-label-filter-menu', event);
+    return false;
+  };
+
+  // Event delegation for Apply and Clear buttons
+  $(document.body).on('click', '#tb-label-filter-apply', function(e) {
+    e.preventDefault(); // Prevent any default button action
+    var selected_labels = [];
+    $('#tb-label-filter-menu input[name="tb_label_filter_checkbox"]:checked').each(function() {
+      selected_labels.push($(this).val());
+    });
+    var filter_string = selected_labels.join(',');
+    // Use rcmail.set_list_options to apply the filter and reload the list
+    rcmail.set_list_options({_labels_filter: filter_string});
+
+    var ui = typeof rcmail_ui !== 'undefined' ? rcmail_ui : (typeof UI !== 'undefined' ? UI : null);
+    if (ui && ui.hide_popup) ui.hide_popup('tb-label-filter-menu', true);
+  });
+
+  $(document.body).on('click', '#tb-label-filter-clear', function(e) {
+    e.preventDefault(); // Prevent any default button action
+    // Use rcmail.set_list_options with null or empty string to clear the filter
+    rcmail.set_list_options({_labels_filter: null});
+    $('#tb-label-filter-menu input[name="tb_label_filter_checkbox"]').prop('checked', false); // Uncheck all
+
+    var ui = typeof rcmail_ui !== 'undefined' ? rcmail_ui : (typeof UI !== 'undefined' ? UI : null);
+    if (ui && ui.hide_popup) ui.hide_popup('tb-label-filter-menu', true);
+    $('#tb-label-filter-button').removeClass('active'); // Remove active state from button
+  });
+
   // handle response after refresh (try to update flags set by another
   // email-client while being logged into roundcube)
   rcmail.addEventListener("responsebeforerefresh", function (p) {
@@ -163,33 +247,59 @@ $(function () {
   });
   // add my submenu to roundcubes UI (for roundcube classic only?)
   if (window.rcube_mail_ui) {
+    // Extend tb_label_popup_add to also register the filter menu if rcube_mail_ui is used (older skins)
+    var original_tb_label_popup_add = rcube_mail_ui.prototype.tb_label_popup_add;
     rcube_mail_ui.prototype.tb_label_popup_add = function () {
-      var add, obj;
-      add = {
-        "tb-label-menu": {
-          id: "tb-label-menu",
-        },
+      // Call original function if it exists
+      if (typeof original_tb_label_popup_add === 'function') {
+        original_tb_label_popup_add.apply(this, arguments);
+      } else { // Basic initialization if original doesn't exist for some reason
+        this.popups = this.popups || {};
+      }
+
+      var popups_to_add = {
+        // "tb-label-menu" should be handled by original or already be there
+        "tb-label-filter-menu": { id: "tb-label-filter-menu" }
       };
-      this.popups = $.extend(this.popups, add);
-      obj = $("#" + this.popups["tb-label-menu"].id);
-      if (obj.length) {
-        this.popups["tb-label-menu"].obj = obj;
-      } else {
-        delete this.popups["tb-label-menu"];
+
+      for (var popup_key in popups_to_add) {
+        if (!this.popups[popup_key]) { // Only add if not already present
+            this.popups[popup_key] = popups_to_add[popup_key];
+        }
+        var obj = $("#" + this.popups[popup_key].id);
+        if (obj.length) {
+            this.popups[popup_key].obj = obj;
+        } else {
+            // If DOM element not found, remove from registered popups to avoid errors
+            delete this.popups[popup_key];
+        }
       }
     };
   }
+  // Ensure check_tb_popup also acknowledges the filter menu for older skins using rcube_mail_ui
+  // This might not be strictly necessary if show_popupmenu directly uses the ID.
   if (window.rcube_mail_ui) {
+    var original_check_tb_popup = rcube_mail_ui.prototype.check_tb_popup;
     rcube_mail_ui.prototype.check_tb_popup = function () {
-      // larry skin doesn't have that variable, popup works automagically, return true
-      if (typeof this.popups === "undefined") {
+       if (typeof this.popups === "undefined") {
+        return true; // No popup system to check, assume direct DOM manipulation works
+      }
+      // Check if both menus are registered; or adapt if only one is needed for a given action
+      // This check might need to be more specific depending on context of call.
+      if (this.popups["tb-label-menu"] && this.popups["tb-label-filter-menu"]) {
         return true;
       }
-      if (this.popups["tb-label-menu"]) {
-        return true;
-      } else {
-        return false;
+       if (this.popups["tb-label-menu"] && !$('#tb-label-filter-menu').length) { // if filter menu doesn't exist on this page
+        return !!this.popups["tb-label-menu"]; // Check only label menu
       }
+      if (this.popups["tb-label-filter-menu"] && !$('#tb-label-menu').length) { // if label menu doesn't exist on this page
+        return !!this.popups["tb-label-filter-menu"]; // Check only filter menu
+      }
+      // Fallback to original if it exists and this more comprehensive check fails
+      if (typeof original_check_tb_popup === 'function') {
+         return original_check_tb_popup.apply(this, arguments);
+      }
+      return false; // Default if popups aren't registered as expected
     };
   }
 });
@@ -718,22 +828,27 @@ rcmail_ctxm_label_set = function (which) {
 
 // -- Shows the roundcube UI submenu of thunderbird labels
 rcm_tb_label_submenu = function (p, obj, ev) {
-  if (typeof rcmail_ui === "undefined") {
-    window.rcmail_ui = UI;
+  var ui = typeof rcmail_ui !== 'undefined' ? rcmail_ui : (typeof UI !== 'undefined' ? UI : null);
+  if (!ui) return false;
+
+  // Ensure popup is registered with UI, especially for older skins
+  // tb_label_popup_add is now extended to handle both popups
+  if (window.rcube_mail_ui && (!ui.popups || !ui.popups['tb-label-menu'])) {
+      if (typeof rcube_mail_ui.prototype.tb_label_popup_add === 'function') {
+        rcube_mail_ui.prototype.tb_label_popup_add.call(ui);
+      }
   }
-  // elastic skin does not have show_popup
-  if (!rcmail_ui.show_popup) {
-    return;
-  }
-  // create sensible popup, using roundcubes internals
-  if (!rcmail_ui.check_tb_popup()) {
-    rcmail_ui.tb_label_popup_add();
-  }
-  // skin larry vs classic
-  if (typeof rcmail_ui.show_popupmenu === "undefined") {
-    return;
-  } else {
-    rcmail_ui.show_popupmenu("tb-label-menu", ev); // classic
+
+  if (typeof ui.show_popupmenu === "function") {
+    ui.show_popupmenu("tb-label-menu", ev);
   }
   return false;
 };
+
+/*
+It's important that rcmail.env._labels_filter is correctly populated by PHP
+when the page loads or reloads, containing the current filter string.
+Example: $this->rc->output->set_env('_labels_filter', rcube_utils::get_input_value('_labels_filter', rcube_utils::INPUT_GPC));
+This should be added in the main plugin class in a hook like 'render_page' or similar,
+if not already covered by Roundcube's standard env var handling for _parameters.
+*/

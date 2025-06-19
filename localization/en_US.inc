@@ -12,6 +12,9 @@ $labels['label2'] = 'Work';
 $labels['label3'] = 'Personal';
 $labels['label4'] = 'To do';
 $labels['label5'] = 'Later';
+$labels['filterbylabels'] = 'Filter by Labels';
+$labels['apply'] = 'Apply';
+$labels['clear'] = 'Clear';
 
 $labels['tb_label_options'] = 'Thunderbird Labels Options';
 $labels['tb_label_enable_option'] = 'Enable labels';
@@ -23,4 +26,3 @@ $labels['tb_label_style_option'] = "UI Style for labels";
 $labels['tb_label_label'] = "Label";
 
 $messages = array();
-

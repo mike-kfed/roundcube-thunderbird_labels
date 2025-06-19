@@ -40,6 +40,8 @@ class thunderbird_labels extends rcube_plugin
 			// pass 'tb_label_enable_shortcuts' and 'tb_label_style' prefs to JS
 			$this->rc->output->set_env('tb_label_enable_shortcuts', $this->rc->config->get('tb_label_enable_shortcuts'));
 			$this->rc->output->set_env('tb_label_style', $this->rc->config->get('tb_label_style'));
+			// Pass current _labels_filter to JS environment so it can be read by tb_label.js
+			$this->rc->output->set_env('_labels_filter', rcube_utils::get_input_value('_labels_filter', rcube_utils::INPUT_GPC));
 
 			$this->include_script('tb_label.js');
 			$this->add_hook('messages_list', array($this, 'read_flags'));
@@ -63,8 +65,27 @@ class thunderbird_labels extends rcube_plugin
 
 
 			$html = $this->template_file2html('toolbar');
-			if ($html)
+			if ($html) {
 				$this->api->add_content($html, 'toolbar');
+            }
+
+			// Add the new filter button to the toolbar
+			// The 'toolbar' template should ideally have a placeholder for additional buttons,
+			// or we might need to adjust the template itself.
+			// For now, let's assume direct addition or that 'toolbar' template handles it.
+			// This is a simplified way to add a button; proper skin integration might be more complex.
+			$filter_button = $this->api->output->button([
+				'command' => 'plugin.thunderbird_labels.rcm_tb_label_filter_submenu',
+				'label'   => rcube::Q($this->gettext('filterbylabels')),
+				'title'   => rcube::Q($this->gettext('filterbylabels')),
+				'class'   => 'button tb-label-filter-button', // Added tb-label-filter-button for JS hooks + styling
+				'innerclass' => 'button-inner', // For styling consistent with Roundcube buttons
+				'type'    => 'link', // Or 'button' depending on styling needs
+				'id'      => 'tb-label-filter-button',
+			]);
+			$this->api->add_content(html::tag('li', ['class' => 'tb_label_filter'], $filter_button), 'toolbar');
+
+
 			// JS function "set_flags" => PHP function "set_flags"
 			$this->register_action('plugin.thunderbird_labels.set_flags', array($this, 'set_flags'));
 
@@ -309,14 +330,57 @@ class thunderbird_labels extends rcube_plugin
 				return $args;
 		}
 
-		// loop over all messages and add $LabelX info to the extra_flags
-		foreach($args['messages'] as $message)
-		{
-			#rcube::write_log($this->name, print_r($message->flags, true));
-			$message->list_flags['extra_flags']['tb_labels'] = array(); # always set extra_flags, needed for javascript later!
-			if (is_array($message->flags))
-				$message->list_flags['extra_flags']['tb_labels'] = $this->custom_flags(array_keys($message->flags));
+		$labels_filter_str = rcube_utils::get_input_value('_labels_filter', rcube_utils::INPUT_GPC);
+		$active_filter_labels = [];
+		if (!empty($labels_filter_str)) {
+			$active_filter_labels = explode(',', $labels_filter_str);
+			// Normalize filter labels similar to how custom_flags does (uppercase, remove $ and \)
+			// This assumes filter labels in the URL are already somewhat normalized or are direct flag names.
+			// For more robust matching, one might need to map them or ensure they match the $LabelN format if that's the input.
+			// For now, let's assume they are like 'LABEL1', 'LABEL2' etc. or other custom flag names.
+			foreach ($active_filter_labels as $key => $label) {
+				$active_filter_labels[$key] = $this->roundcube_flag($label);
+			}
 		}
+
+		$filtered_messages = [];
+		// loop over all messages and add $LabelX info to the extra_flags
+		foreach($args['messages'] as $idx => $message) // Use $idx for potential unsetting
+		{
+			$message_actual_labels = array();
+			if (is_array($message->flags)) {
+				$message_actual_labels = $this->custom_flags(array_keys($message->flags));
+			}
+
+			// Apply filter
+			if (!empty($active_filter_labels)) {
+				$message_has_all_filter_labels = true;
+				foreach ($active_filter_labels as $filter_label) {
+					if (!in_array($filter_label, $message_actual_labels)) {
+						$message_has_all_filter_labels = false;
+						break;
+					}
+				}
+				if (!$message_has_all_filter_labels) {
+					// Mark for removal by not adding to $filtered_messages or directly unset
+					// Using unset and then re-keying $args['messages'] can be complex.
+					// It's often safer to build a new array.
+					continue; // Skip this message, it doesn't match
+				}
+			}
+
+			// Preserve existing functionality: set extra_flags
+			$message->list_flags['extra_flags']['tb_labels'] = $message_actual_labels;
+			$filtered_messages[] = $message; // Add to the new array if not filtered out
+		}
+
+		if (!empty($active_filter_labels)) {
+			$args['messages'] = $filtered_messages;
+			// Potentially update message count if other parts of Roundcube rely on it
+			// $this->rc->output->set_env('message_count', count($args['messages']));
+			// $this->rc->output->set_env('page_size', count($args['messages'])); // If on one page
+		}
+
 		return($args);
 	}
 
@@ -419,8 +483,35 @@ class thunderbird_labels extends rcube_plugin
 			$i++;
 		}
 		$html = $this->template2html($tpl.$tpl_menu.$tpl_end);
-		if ($html)
+		if ($html) {
 			$this->rc->output->add_footer($html);
+        }
+
+		// HTML for the filter popup menu
+		$filter_popup_html = '<div id="tb-label-filter-menu" class="popupmenu" style="display:none;">';
+		$filter_popup_html .= '<h3 id="aria-label-tb-labelfiltermenu" class="voice">' . rcube::Q($this->gettext('filterbylabels')) . '</h3>';
+		$filter_popup_html .= '<ul class="toolbarmenu listing" role="menu" aria-labelledby="aria-label-tb-labelfiltermenu">';
+
+		$custom_labels_for_filter = $this->rc->config->get('tb_label_custom_labels');
+		// LABEL0 is "No Label", usually not something to filter by in this context, so skip it.
+		if (isset($custom_labels_for_filter['LABEL0'])) {
+			// unset($custom_labels_for_filter['LABEL0']); // Or just don't iterate over it if it's always first
+		}
+
+		foreach ($custom_labels_for_filter as $label_key => $human_readable_name) {
+			if ($label_key === 'LABEL0') continue; // Skip "No label"
+
+			$filter_popup_html .= '<li><label>';
+			$filter_popup_html .= '<input type="checkbox" name="tb_label_filter_checkbox" value="' . rcube::Q($label_key) . '" id="tb-filter-' . rcube::Q($label_key) . '"> ';
+			$filter_popup_html .= rcube::Q($human_readable_name);
+			$filter_popup_html .= '</label></li>';
+		}
+
+		$filter_popup_html .= '<li class="separator_above"><button type="button" id="tb-label-filter-apply" class="button mainaction">' . rcube::Q($this->gettext('apply')) . '</button> ';
+		$filter_popup_html .= '<button type="button" id="tb-label-filter-clear" class="button">' . rcube::Q($this->gettext('clear')) . '</button></li>';
+		$filter_popup_html .= '</ul></div>';
+
+		$this->rc->output->add_footer($filter_popup_html);
 	}
 
 	/* Bastardised hook, actually supposed to modify the list of folders for refresh
