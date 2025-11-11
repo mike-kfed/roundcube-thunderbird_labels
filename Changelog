@@ -1,9 +1,7 @@
-v1.6.3
----
-- added arabic Tunisia translation (PR 85 by soufien88y)
-
 v1.6.2
 ---
+- added arabic Tunisia translation (PR 85 by soufien88y)
+- improved display of badges and labels (PR 90 by RobinAngele)
 - added swedish translation (PR 72 by Daniel Johansson - LANTECH)
 - avoid dynamic property deprecation warnings of PHP 8.2 (PR 75 by Nik Soggia)
 - Fix issue #69 needless space use in classic skin (PR 77 by buttercookie42)
