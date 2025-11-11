@@ -1,3 +1,7 @@
+v1.6.3
+---
+- apply `deno fmt` to CSS and javascript
+
 v1.6.2
 ---
 - added arabic Tunisia translation (PR 85 by soufien88y)

@@ -65,7 +65,7 @@ $(function () {
       $("#tb_label_ctxm_mainmenu"),
       "moreacts",
       "after",
-      true
+      true,
     );
   }
   // single message displayed?
@@ -78,7 +78,7 @@ $(function () {
     }
     // classic skin
     labelbox_parent.append(
-      '<div id="labelbox" class="' + rcmail.env.tb_label_style + '"></div>'
+      '<div id="labelbox" class="' + rcmail.env.tb_label_style + '"></div>',
     );
     labels_for_message.sort(function (a, b) {
       return a - b;
@@ -98,22 +98,22 @@ $(function () {
     rcmail.register_command(
       "plugin.thunderbird_labels.rcm_tb_label_submenu",
       rcm_tb_label_submenu,
-      rcmail.env.uid
+      rcmail.env.uid,
     );
     rcmail.register_command(
       "plugin.thunderbird_labels.rcm_tb_label_menuclick",
       rcm_tb_label_menuclick,
-      rcmail.env.uid
+      rcmail.env.uid,
     );
     if (rcmail.message_list) {
       rcmail.message_list.addEventListener("select", function (list) {
         rcmail.enable_command(
           "plugin.thunderbird_labels.rcm_tb_label_submenu",
-          list.get_selection().length > 0
+          list.get_selection().length > 0,
         );
         rcmail.enable_command(
           "plugin.thunderbird_labels.rcm_tb_label_menuclick",
-          list.get_selection().length > 0
+          list.get_selection().length > 0,
         );
       });
     }
@@ -258,24 +258,26 @@ rcm_tb_label_css = (function () {
       escaped_label_name = "tb_label_" + label_name;
       css += "table.{0}\n{\n  background-color: {1};\n}".format(
         escaped_label_name,
-        colors.bg
+        colors.bg,
       );
       // Unselected (unfocused) message
       css +=
-        "#messagelist tr.{0} td,\n#messagelist tr.{0} td a,\nspan.{0},\n.records-table tr.selected td span.{0}\n{\n  color: {1} !important;\n}\n\n.toolbarmenu li.{0},\n.toolbarmenu li.{0} a.active\n{\n  color: {2};\n}".format(
-          escaped_label_name,
-          colors.fg,
-          colors.light
-        );
+        "#messagelist tr.{0} td,\n#messagelist tr.{0} td a,\nspan.{0},\n.records-table tr.selected td span.{0}\n{\n  color: {1} !important;\n}\n\n.toolbarmenu li.{0},\n.toolbarmenu li.{0} a.active\n{\n  color: {2};\n}"
+          .format(
+            escaped_label_name,
+            colors.fg,
+            colors.light,
+          );
       // Selected messages
       css +=
-        "#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}".format(
-          escaped_label_name,
-          colors.bg
-        );
+        "#messagelist tr.selected.{0} td,\n#messagelist tr.selected.{0} td a\n{\n  color: #FFFFFF;\n  background-color: {1};\n}"
+          .format(
+            escaped_label_name,
+            colors.bg,
+          );
       css += "div#labelbox span.box_{0}\n{\n  background-color: {1};\n}".format(
         escaped_label_name,
-        colors.box
+        colors.box,
       );
     }
     return css;
@@ -308,7 +310,7 @@ rcm_tb_label_insert = function (uid, row) {
   rowobj
     .find("td.subject")
     .append(
-      '<span class="tb_label_dots ' + rcmail.env.tb_label_style + '"></span>'
+      '<span class="tb_label_dots ' + rcmail.env.tb_label_style + '"></span>',
     );
   if (message.flags && message.flags.tb_labels) {
     if (message.flags.tb_labels.length) {
@@ -326,7 +328,7 @@ rcm_tb_label_insert = function (uid, row) {
               label_name +
               '" title="' +
               i18n_label(label_name) +
-              '">&#8226;</span>'
+              '">&#8226;</span>',
           );
         }
       } else if (rcmail.env.tb_label_style === "badges") {
@@ -339,7 +341,7 @@ rcm_tb_label_insert = function (uid, row) {
                 label_name.toLowerCase() +
                 '">' +
                 i18n_label(label_name) +
-                "</span>"
+                "</span>",
             );
           }
         }
@@ -390,7 +392,7 @@ rcm_tb_label_find_main_window = function () {
      * potentially go away.
      * php injects the needed global variables into the popup window html code
      * Problem: changes of labels are not known to the main window.
-     * */
+     */
     w = window;
   }
   ms = w.document.getElementById("mainscreen");
@@ -465,7 +467,7 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
             toggle_label_no +
             '">' +
             i18n_label(toggle_label_no) +
-            "</span>"
+            "</span>",
         );
       } else {
         headers_table.removeClass("tb_label_" + toggle_label_no);
@@ -517,7 +519,7 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
             toggle_label_no +
             '" title="' +
             i18n_label(toggle_label_no) +
-            '">&#8226;</span>'
+            '">&#8226;</span>',
         );
       } else if (rcmail.env.tb_label_style === "badges") {
         spanobj.append(
@@ -525,7 +527,7 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
             toggle_label_no.toLowerCase() +
             '">' +
             i18n_label(toggle_label_no) +
-            "</span>"
+            "</span>",
         );
       } else {
         rowobj.addClass("tb_label_" + toggle_label_no);
@@ -538,14 +540,14 @@ rcm_tb_label_flag_toggle = function (flag_uids, toggle_label_no, onoff) {
       if (rcmail.env.tb_label_style === "bullets") {
         rowobj
           .find(
-            "td.subject span.tb_label_dots span.tb_label_" + toggle_label_no
+            "td.subject span.tb_label_dots span.tb_label_" + toggle_label_no,
           )
           .remove();
       } else if (rcmail.env.tb_label_style === "badges") {
         rowobj
           .find(
             "td.subject span.tb_label_dots span.tb_label_badges." +
-              toggle_label_no.toLowerCase()
+              toggle_label_no.toLowerCase(),
           )
           .remove();
       } else {
@@ -630,7 +632,7 @@ rcm_tb_label_toggle = function (toggle_label) {
       if (
         jQuery.inArray(
           toggle_label_no,
-          rcm_tb_label_global("tb_labels_for_message")
+          rcm_tb_label_global("tb_labels_for_message"),
         ) >= 0
       ) {
         first_toggle_mode = "off";
@@ -686,7 +688,7 @@ rcm_tb_label_toggle = function (toggle_label) {
         urlencode(rcmail.env.mailbox) +
         "&_toggle_label=" +
         toggle_label,
-      lock
+      lock,
     );
     // remove/add classes and tb labels from messages in JS
     rcm_tb_label_flag_msgs(flag_uids, toggle_label_no);
