@@ -10,66 +10,53 @@
 }
 
 /* for menuitems non-active */
-.toolbarmenu li a.label0
-{
-  color: #CCC;
+.toolbarmenu li a.label0 {
+  color: #ccc;
 }
-.toolbarmenu li a.label0.active
-{
+.toolbarmenu li a.label0.active {
   color: #333;
 }
-.toolbarmenu li a.label1
-{
-  color: #FCC;
+.toolbarmenu li a.label1 {
+  color: #fcc;
 }
-.toolbarmenu li a.label2,
-{
-  color: #FC3;
+.toolbarmenu li a.label2 {
+  color: #fc3;
 }
-.toolbarmenu li a.label3
-{
-  color: #3C3;
+.toolbarmenu li a.label3 {
+  color: #3c3;
 }
-.toolbarmenu li a.label4
-{
-  color: #99F;
+.toolbarmenu li a.label4 {
+  color: #99f;
 }
-.toolbarmenu li a.label5
-{
-  color: #C9C;
+.toolbarmenu li a.label5 {
+  color: #c9c;
 }
 
 /* for menuitems active */
 .toolbarmenu li a.label1.active,
-span.label1
-{
-  color: #FF0000;
+span.label1 {
+  color: #ff0000;
 }
 
 .toolbarmenu li a.label2.active,
-span.label2
-{
-  color: #FF9900;
+span.label2 {
+  color: #ff9900;
 }
 
 .toolbarmenu li a.label3.active,
-span.label3
-{
+span.label3 {
   color: #009900;
 }
 
 .toolbarmenu li a.label4.active,
-span.label4
-{
-  color: #3333FF;
+span.label4 {
+  color: #3333ff;
 }
 
 .toolbarmenu li a.label5.active,
-span.label5
-{
+span.label5 {
   color: #993399;
 }
-
 
 /* dots for labels */
 span.tb_label_dots {
@@ -94,7 +81,6 @@ span.tb_label_dots span {
   line-height: 0px;
 }
 
-
 div#labelbox {
   white-space: nowrap;
   position: absolute;
@@ -102,37 +88,35 @@ div#labelbox {
   top: 10px;
 }
 
-
 div#labelbox span {
-    margin: 0 3px;
-    padding: 2px;
-    border: 1px solid black;
-    border-radius: 3px;
-    color: #black;
-    font-weight: bold;
-    font-size: 11px;
+  margin: 0 3px;
+  padding: 2px;
+  border: 1px solid black;
+  border-radius: 3px;
+  color: #black;
+  font-weight: bold;
+  font-size: 11px;
 }
-  
+
 div#labelbox span.tb_label_span1 {
-  background-color: #FF2200;
+  background-color: #ff2200;
 }
 
 div#labelbox span.tb_label_span2 {
-  background-color: #FF9900;
+  background-color: #ff9900;
 }
 
 div#labelbox span.tb_label_span3 {
-  background-color: #00CC00;
+  background-color: #00cc00;
 }
 
 div#labelbox span.tb_label_span4 {
-  background-color: #0CF;
+  background-color: #0cf;
 }
 
 div#labelbox span.tb_label_span5 {
-  background-color: #FF33FF;
-}  
-
+  background-color: #ff33ff;
+}
 
 /* Non-labeled selected message: changed to make it look "like" Thunderbird */
 /*#messagelist tr.selected td
@@ -161,49 +145,53 @@ div#labelbox span.tb_label_span5 {
 }
 */
 .badge {
-    display: inline-block;
-    padding: 0.25em 0.4em;
-    font-size: 75%;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-    white-space: nowrap;
-    vertical-align: baseline;
-    border-radius: 0.25rem;
-    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
 }
 
 span.tb_label_dots.badges:not(:empty) {
-	margin: 3px 1.1em 1.5em 1.4em;
-	clear: both;
-	display: block;
+  margin: 3px 1.1em 1.5em 1.4em;
+  clear: both;
+  display: block;
 }
 
 span.tb_label_dots span.tb_label_badges {
-	font-size: 11px;
-	line-height: 11px !important;
-	color: #fff;
-	margin-right: 8px;
-	margin-bottom: 3px;
-	margin-top: -2px;
-	background-color: #c9c9c9;
+  font-size: 11px;
+  line-height: 11px !important;
+  color: #fff;
+  margin-right: 8px;
+  margin-bottom: 3px;
+  margin-top: -2px;
+  background-color: #c9c9c9;
 }
 .tb_label_badges.label1 {
-	background-color: #ff0000 !important;
+  background-color: #ff0000 !important;
 }
 
 .tb_label_badges.label2 {
-	background-color: #ff9900 !important;
+  background-color: #ff9900 !important;
 }
 
 .tb_label_badges.label3 {
-	background-color: #009900 !important;
+  background-color: #009900 !important;
 }
 
 .tb_label_badges.label4 {
-	background-color: #3333ff !important;
+  background-color: #3333ff !important;
 }
 
 .tb_label_badges.label5 {
-	background-color: #993399 !important;
+  background-color: #993399 !important;
 }
