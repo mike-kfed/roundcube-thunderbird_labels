@@ -1,41 +1,34 @@
-/* Combined: keep original 'dots' treatment (as in your provided original CSS),
-   but improve the label row so badges appear in a dedicated flowing row under
-   the subject, default to white background for unlabeled/custom tags, and
-   allow wrapping via flex-wrap. */
+/* Styling for dots, an additional label row so badges appear in a dedicated
+   flowing row under the subject, default to white background for unlabeled/custom tags,
+   and allow wrapping via flex-wrap. */
 
-/* menu / legend colors (unchanged from original) */
+/* menu / legend colors */
 .toolbarmenu li.label0,
-.toolbarmenu li.label0 a.active
-{
-  color: #EEE;
+.toolbarmenu li.label0 a.active {
+  color: #eee;
 }
 
-.toolbarmenu li .label1
-{
-  color: #FF0000 !important;
+.toolbarmenu li .label1 {
+  color: #ff0000 !important;
 }
 
-.toolbarmenu li .label2
-{
-  color: #FF9900 !important;
+.toolbarmenu li .label2 {
+  color: #ff9900 !important;
 }
 
-.toolbarmenu li .label3
-{
+.toolbarmenu li .label3 {
   color: #009900 !important;
 }
 
-.toolbarmenu li .label4
-{
-  color: #3333FF !important;
+.toolbarmenu li .label4 {
+  color: #3333ff !important;
 }
 
-.toolbarmenu li .label5
-{
+.toolbarmenu li .label5 {
   color: #993399 !important;
 }
 
-/* Dots: kept as in the original version you like */
+/* Dots: kept as in the other skins */
 span.tb_label_dots {
   margin-left: 18px;
   line-height: 0px !important;
@@ -46,7 +39,7 @@ span.tb_label_dots span {
   line-height: 0px !important;
 }
 
-/* Keep small/badge dot style (original), but ensure badges can wrap below via the badge container */
+/* Keep small/badge dot style, but ensure badges can wrap below via the badge container */
 span.tb_label_dots span.tb_label_badges {
   font-size: 11px;
   line-height: 11px !important;
@@ -57,7 +50,7 @@ span.tb_label_dots span.tb_label_badges {
   background-color: #c9c9c9;
 }
 
-/* keep the original TB badge color classes (unchanged) */
+/* Mimic original Thunderbird badge color classes */
 .tb_label_badges.label1 {
   background-color: #ff0000 !important;
 }
@@ -78,22 +71,20 @@ span.tb_label_dots span.tb_label_badges {
   background-color: #993399 !important;
 }
 
-/* ----- IMPROVEMENTS: label row below subject, default white for unlabeled tags, wrapping ----- */
-
-/* labelbox: previously absolute — now a flowing flex container under the subject
+/* labelbox: a flowing flex container under the subject
    so it does not overlap the title, and can wrap when there are many labels. */
 div#labelbox {
-  white-space: normal;        /* allow labels to wrap */
-  position: static;           /* flow in document under the subject */
+  white-space: normal; /* allow labels to wrap */
+  position: static; /* flow in document under the subject */
   right: auto;
   top: auto;
-  display: flex;              /* horizontal layout with wrapping */
-  flex-wrap: wrap;            /* wrap badges onto multiple lines as needed */
+  display: flex; /* horizontal layout with wrapping */
+  flex-wrap: wrap; /* wrap badges onto multiple lines as needed */
   align-items: center;
-  gap: 6px;                   /* consistent spacing between label items */
+  gap: 6px; /* consistent spacing between label items */
   width: 100%;
-  margin-top: 6px;            /* gap between subject and label row */
-  padding-left: 1.5em;        /* align with subject text area; adjust if needed */
+  margin-top: 6px; /* gap between subject and label row */
+  padding-left: 1.5em; /* align with subject text area; adjust if needed */
   box-sizing: border-box;
 }
 
@@ -105,91 +96,85 @@ div#labelbox span {
   align-items: center;
   margin: 0;
   padding: 3px 6px;
-  border: 1px solid rgba(0,0,0,0.12);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 3px;
-  background-color: #ffffff;  /* default white background for unlabeled/custom tags */
-  color: #000000;             /* readable dark text on white */
+  background-color: #ffffff; /* default white background for unlabeled/custom tags */
+  color: #000000; /* readable dark text on white */
   font-weight: bold;
   font-size: 11px;
   line-height: 1;
-  min-height: 20px;           /* decent touch target on mobile */
+  min-height: 20px; /* decent touch target on mobile */
   box-sizing: border-box;
-  word-break: keep-all;       /* keep label text together; container wraps labels as units */
+  word-break: keep-all; /* keep label text together; container wraps labels as units */
 }
 
 /* Preserve explicit colored span rules to keep original thunderbird colors */
 div#labelbox span.tb_label_span1,
 .tb_label_badges.label1 {
-  background-color: #FF2200 !important;
+  background-color: #ff2200 !important;
   color: #fff !important;
 }
 
 div#labelbox span.tb_label_span2,
 .tb_label_badges.label2 {
-  background-color: #FF9900 !important;
+  background-color: #ff9900 !important;
   color: #fff !important;
 }
 
 div#labelbox span.tb_label_span3,
 .tb_label_badges.label3 {
-  background-color: #00CC00 !important;
+  background-color: #00cc00 !important;
   color: #fff !important;
 }
 
 div#labelbox span.tb_label_span4,
 .tb_label_badges.label4 {
-  background-color: #0CF !important;
+  background-color: #0cf !important;
   color: #fff !important;
 }
 
 div#labelbox span.tb_label_span5,
 .tb_label_badges.label5 {
-  background-color: #FF33FF !important;
+  background-color: #ff33ff !important;
   color: #fff !important;
 }
 
 /* Contextmenu/icon decorations (kept as original) */
 #sections-table tbody #rcmrowthunderbird_labels td.section:before {
-  content: "\f507";  /* user-tag */
+  content: "\f507"; /* user-tag */
 }
 
 .toolbar a.button.tb-label:before {
-  content: "\f507";  /* user-tag */
+  content: "\f507"; /* user-tag */
 }
 
 div.contextmenu a.rcm-uidropdown::before {
-  content: "\f507";  /* user-tag */
+  content: "\f507"; /* user-tag */
 }
 
 /* contextmenu color rules (kept as original) */
 div.contextmenu li.label0,
-div.contextmenu li.label0 a.active
-{
-  color: #EEE;
+div.contextmenu li.label0 a.active {
+  color: #eee;
 }
 
-div.contextmenu li .label1
-{
-  color: #FF0000 !important;
+div.contextmenu li .label1 {
+  color: #ff0000 !important;
 }
 
-div.contextmenu li .label2
-{
-  color: #FF9900 !important;
+div.contextmenu li .label2 {
+  color: #ff9900 !important;
 }
 
-div.contextmenu li .label3
-{
+div.contextmenu li .label3 {
   color: #009900 !important;
 }
 
-div.contextmenu li .label4
-{
-  color: #3333FF !important;
+div.contextmenu li .label4 {
+  color: #3333ff !important;
 }
 
-div.contextmenu li .label5
-{
+div.contextmenu li .label5 {
   color: #993399 !important;
 }
 
