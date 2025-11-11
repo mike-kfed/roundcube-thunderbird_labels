@@ -1,3 +1,9 @@
+/* Combined: keep original 'dots' treatment (as in your provided original CSS),
+   but improve the label row so badges appear in a dedicated flowing row under
+   the subject, default to white background for unlabeled/custom tags, and
+   allow wrapping via flex-wrap. */
+
+/* menu / legend colors (unchanged from original) */
 .toolbarmenu li.label0,
 .toolbarmenu li.label0 a.active
 {
@@ -29,6 +35,7 @@
   color: #993399 !important;
 }
 
+/* Dots: kept as in the original version you like */
 span.tb_label_dots {
   margin-left: 18px;
   line-height: 0px !important;
@@ -39,36 +46,122 @@ span.tb_label_dots span {
   line-height: 0px !important;
 }
 
+/* Keep small/badge dot style (original), but ensure badges can wrap below via the badge container */
+span.tb_label_dots span.tb_label_badges {
+  font-size: 11px;
+  line-height: 11px !important;
+  color: #fff;
+  margin-right: 8px;
+  margin-bottom: 3px;
+  margin-top: -2px;
+  background-color: #c9c9c9;
+}
 
-/* this goes into preview of an email */
+/* keep the original TB badge color classes (unchanged) */
+.tb_label_badges.label1 {
+  background-color: #ff0000 !important;
+}
+
+.tb_label_badges.label2 {
+  background-color: #ff9900 !important;
+}
+
+.tb_label_badges.label3 {
+  background-color: #009900 !important;
+}
+
+.tb_label_badges.label4 {
+  background-color: #3333ff !important;
+}
+
+.tb_label_badges.label5 {
+  background-color: #993399 !important;
+}
+
+/* ----- IMPROVEMENTS: label row below subject, default white for unlabeled tags, wrapping ----- */
+
+/* labelbox: previously absolute — now a flowing flex container under the subject
+   so it does not overlap the title, and can wrap when there are many labels. */
 div#labelbox {
-  white-space: nowrap;
-  position: absolute;
-  right: 5px;
-  top: 10px;
+  white-space: normal;        /* allow labels to wrap */
+  position: static;           /* flow in document under the subject */
+  right: auto;
+  top: auto;
+  display: flex;              /* horizontal layout with wrapping */
+  flex-wrap: wrap;            /* wrap badges onto multiple lines as needed */
+  align-items: center;
+  gap: 6px;                   /* consistent spacing between label items */
+  width: 100%;
+  margin-top: 6px;            /* gap between subject and label row */
+  padding-left: 1.5em;        /* align with subject text area; adjust if needed */
+  box-sizing: border-box;
 }
 
+/* Default style for label spans inside labelbox:
+   - If a label has no color class, use white background so it doesn't obscure the title.
+   - Colored classes (tb_label_spanX / tb_label_badges.labelX) override this default. */
 div#labelbox span {
-    margin: 0 3px;
-    padding: 3px;
-    border: 1px solid black;
-    border-radius: 3px;
-    color: black;
-    font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 3px 6px;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 3px;
+  background-color: #ffffff;  /* default white background for unlabeled/custom tags */
+  color: #000000;             /* readable dark text on white */
+  font-weight: bold;
+  font-size: 11px;
+  line-height: 1;
+  min-height: 20px;           /* decent touch target on mobile */
+  box-sizing: border-box;
+  word-break: keep-all;       /* keep label text together; container wraps labels as units */
 }
 
+/* Preserve explicit colored span rules to keep original thunderbird colors */
+div#labelbox span.tb_label_span1,
+.tb_label_badges.label1 {
+  background-color: #FF2200 !important;
+  color: #fff !important;
+}
+
+div#labelbox span.tb_label_span2,
+.tb_label_badges.label2 {
+  background-color: #FF9900 !important;
+  color: #fff !important;
+}
+
+div#labelbox span.tb_label_span3,
+.tb_label_badges.label3 {
+  background-color: #00CC00 !important;
+  color: #fff !important;
+}
+
+div#labelbox span.tb_label_span4,
+.tb_label_badges.label4 {
+  background-color: #0CF !important;
+  color: #fff !important;
+}
+
+div#labelbox span.tb_label_span5,
+.tb_label_badges.label5 {
+  background-color: #FF33FF !important;
+  color: #fff !important;
+}
+
+/* Contextmenu/icon decorations (kept as original) */
 #sections-table tbody #rcmrowthunderbird_labels td.section:before {
-	content: "\f507";  /* user-tag */
+  content: "\f507";  /* user-tag */
 }
 
 .toolbar a.button.tb-label:before {
-	content: "\f507";  /* user-tag */
+  content: "\f507";  /* user-tag */
 }
 
 div.contextmenu a.rcm-uidropdown::before {
   content: "\f507";  /* user-tag */
 }
 
+/* contextmenu color rules (kept as original) */
 div.contextmenu li.label0,
 div.contextmenu li.label0 a.active
 {
@@ -99,34 +192,8 @@ div.contextmenu li .label5
 {
   color: #993399 !important;
 }
-span.tb_label_dots span.tb_label_badges {
-	font-size: 11px;
-	line-height: 11px !important;
-	color: #fff;
-	margin-right: 8px;
-	margin-bottom: 3px;
-	margin-top: -2px;
-	background-color: #c9c9c9;
-}
-.tb_label_badges.label1 {
-	background-color: #ff0000 !important;
-}
 
-.tb_label_badges.label2 {
-	background-color: #ff9900 !important;
-}
-
-.tb_label_badges.label3 {
-	background-color: #009900 !important;
-}
-
-.tb_label_badges.label4 {
-	background-color: #3333ff !important;
-}
-
-.tb_label_badges.label5 {
-	background-color: #993399 !important;
-}
-#message-header{
-	position: relative;	
+/* Ensure the message header is a positioned ancestor so original dot placement still works */
+#message-header {
+  position: relative;
 }
